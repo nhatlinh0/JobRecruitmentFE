@@ -1,0 +1,46 @@
+.logo {
+  align-items: center;
+  color: var(--ink);
+  display: inline-flex;
+  font-size: 21px;
+  font-weight: 750;
+  gap: 9px;
+  letter-spacing: -1px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.logo-mark {
+  align-items: center;
+  background: var(--green);
+  border-radius: 10px;
+  color: white;
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.logo-mark svg {
+  height: 21px;
+  width: 21px;
+}
+
+.logo-accent {
+  color: var(--green);
+}
+
+.logo.logo-small {
+  font-size: 17px;
+}
+
+.logo-small .logo-mark {
+  border-radius: 8px;
+  height: 29px;
+  width: 29px;
+}
+
+.logo-small .logo-mark svg {
+  height: 18px;
+  width: 18px;
+}

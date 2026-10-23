@@ -1,0 +1,134 @@
+.site-header {
+  align-items: center;
+  display: flex;
+  height: 84px;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: 0 36px;
+  position: relative;
+}
+
+.main-nav,
+.header-actions {
+  align-items: center;
+  display: flex;
+}
+
+.main-nav {
+  align-items: stretch;
+  gap: 22px;
+  height: 100%;
+  margin-left: 28px;
+}
+
+.main-nav > .nav-link {
+  align-items: center;
+  display: inline-flex;
+}
+
+.nav-link,
+.login-link {
+  color: #707d7a;
+  font-size: 12.5px;
+  font-weight: 550;
+  text-decoration: none;
+  transition: color 160ms ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover,
+.login-link:hover,
+.nav-link.active {
+  color: var(--ink);
+}
+
+.nav-link.active {
+  font-weight: 700;
+}
+
+.header-actions {
+  gap: 18px;
+  margin-left: 20px;
+}
+
+.header-cta {
+  min-height: 42px;
+  padding: 0 17px;
+  white-space: nowrap;
+}
+
+.mobile-menu {
+  background: none;
+  border: 0;
+  color: var(--ink);
+  cursor: pointer;
+  display: none;
+  padding: 5px;
+}
+
+.mobile-menu svg {
+  height: 24px;
+  width: 24px;
+}
+
+@media (max-width: 1050px) {
+  .site-header {
+    height: 74px;
+  }
+
+  .main-nav {
+    gap: 16px;
+    margin-left: 14px;
+  }
+
+  .nav-link,
+  .login-link {
+    font-size: 12px;
+  }
+
+  .header-actions {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    height: 69px;
+    padding: 0 21px;
+    position: relative;
+    z-index: 5;
+  }
+
+  .header-actions,
+  .main-nav {
+    display: none;
+  }
+
+  .main-nav.is-open {
+    align-items: stretch;
+    background: white;
+    border: 1px solid #e7eeeb;
+    border-radius: 10px;
+    box-shadow: 0 12px 28px #234d3718;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    height: auto;
+    left: 14px;
+    margin: 0;
+    padding: 7px;
+    position: absolute;
+    right: 14px;
+    top: 61px;
+  }
+
+  .main-nav.is-open > .nav-link {
+    border-radius: 6px;
+    padding: 11px 10px;
+  }
+
+  .mobile-menu {
+    display: inline-flex;
+  }
+}

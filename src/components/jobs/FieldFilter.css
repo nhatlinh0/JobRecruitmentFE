@@ -1,0 +1,53 @@
+.field-filter {
+  display: flex;
+  gap: 9px;
+  margin: 29px 0 19px;
+  overflow-x: auto;
+  padding-bottom: 3px;
+  scrollbar-width: none;
+}
+
+.field-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.field-chip {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #e7ece8;
+  border-radius: 7px;
+  color: #65736c;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 11px;
+  gap: 8px;
+  padding: 9px 12px;
+  transition: all 150ms ease;
+}
+
+.field-chip span {
+  color: #a3ada7;
+  font-size: 10px;
+}
+
+.field-chip:hover,
+.field-chip.selected {
+  background: #eaf4ee;
+  border-color: #cce3d5;
+  color: var(--green-dark);
+}
+
+.field-chip.selected {
+  font-weight: 700;
+}
+
+.field-chip.selected span {
+  color: #66917a;
+}
+
+@media (max-width: 760px) {
+  .field-filter {
+    margin-top: 22px;
+  }
+}

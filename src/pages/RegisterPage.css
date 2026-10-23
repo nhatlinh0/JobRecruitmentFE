@@ -1,0 +1,16 @@
+.register { flex: 1; display: flex; justify-content: center; align-items: center; padding: 48px 16px; }
+.register__form {
+  width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 16px;
+  padding: 32px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff;
+}
+.register__form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.register__form input:not([type='radio']) {
+  padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;
+}
+.register__type { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; }
+.register__type label { flex-direction: row; align-items: center; gap: 8px; margin: 4px 0; }
+.register__form button {
+  padding: 12px; border: 0; border-radius: 8px; background: #2563eb; color: #fff;
+  font-weight: 600; cursor: pointer;
+}
+.register__hint { margin: 0; font-size: 14px; text-align: center; }

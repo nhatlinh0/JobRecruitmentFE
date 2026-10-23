@@ -1,0 +1,64 @@
+.trust-strip {
+  border-bottom: 1px solid #ecf0eb;
+  border-top: 1px solid #ecf0eb;
+  margin: 0 auto;
+  max-width: 1368px;
+  padding: 22px 36px 27px;
+  text-align: center;
+}
+
+.trust-strip > p {
+  color: #9aa49e;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 1.35px;
+  margin: 0 0 19px;
+}
+
+.company-logos {
+  align-items: center;
+  color: #7e8d86;
+  display: flex;
+  gap: 60px;
+  justify-content: center;
+}
+
+.company-logos span {
+  font-size: 20px;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+  opacity: 0.76;
+}
+
+.company-logos .logo-momo { color: #b04788; font-weight: 800; }
+.company-logos .logo-tiki { color: #3985d1; font-size: 24px; font-weight: 850; letter-spacing: -2px; }
+.company-logos .logo-vng { color: #5199df; font-style: italic; font-weight: 850; }
+.company-logos .logo-shopee { color: #d97657; font-size: 17px; }
+.company-logos .logo-fpt { color: #727c83; font-size: 16px; }
+.company-logos .logo-zalo { color: #5e92d1; font-size: 18px; }
+
+@media (max-width: 1050px) {
+  .company-logos {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 760px) {
+  .trust-strip {
+    padding: 20px 20px 24px;
+  }
+
+  .company-logos {
+    flex-wrap: wrap;
+    gap: 20px 32px;
+  }
+
+  .company-logos span {
+    font-size: 18px;
+  }
+
+  .company-logos .logo-tiki { font-size: 21px; }
+  .company-logos .logo-shopee,
+  .company-logos .logo-fpt,
+  .company-logos .logo-zalo { font-size: 15px; }
+}
