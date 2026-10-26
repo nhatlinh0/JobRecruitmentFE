@@ -1,9 +1,13 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import { createMockToken } from '../utils/mockJwt'
 import type { RegisterPayload, Role } from '../types/auth'
 import './RegisterPage.css'
 
 export function RegisterPage() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
@@ -12,7 +16,9 @@ export function RegisterPage() {
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
     const payload: RegisterPayload = { email, password, username, role }
-    console.log(payload) // TODO: gọi API đăng ký
+    // Giả lập server: đăng ký xong trả token và đăng nhập luôn
+    login(createMockToken({ email: payload.email, username: payload.username, role: payload.role }))
+    navigate('/')
   }
 
   return (

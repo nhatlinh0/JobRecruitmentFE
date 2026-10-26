@@ -73,6 +73,24 @@
   color: var(--green-dark);
 }
 
+.mega-footer {
+  border-top: 1px solid #e7eeeb;
+  margin-top: 12px;
+  padding-top: 12px;
+  text-align: center;
+}
+
+.mega-view-all {
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mega-view-all:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 1050px) {
   .mega-panel {
     left: 28px;

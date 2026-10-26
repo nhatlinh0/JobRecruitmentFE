@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
+import { UserMenu } from './UserMenu'
 import { navGroups, navItems } from '../../data/navigation'
 import { Icon } from '../ui/Icon'
 import { Logo } from '../ui/Logo'
@@ -7,6 +9,7 @@ import { NavDropdown } from './NavDropdown'
 import './Header.css'
 
 export function Header() {
+  const { user } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [openGroup, setOpenGroup] = useState<string | null>(null)
   const headerRef = useRef<HTMLElement>(null)
@@ -60,9 +63,14 @@ export function Header() {
         ))}
       </nav>
       <div className="header-actions">
-        <Link className="login-link" to="/login" onClick={closeAll}>Đăng nhập</Link>
-        <Link className="login-link" to="/register" onClick={closeAll}>Đăng ký</Link>
-        <a className="button button-primary header-cta" href="#post-job">Đăng tuyển</a>
+        {user ? (
+          <UserMenu onNavigate={closeAll} />
+        ) : (
+          <>
+            <Link className="login-link" to="/login" onClick={closeAll}>Đăng nhập</Link>
+            <Link className="button button-primary header-cta" to="/register" onClick={closeAll}>Đăng ký</Link>
+          </>
+        )}
       </div>
       <button
         aria-expanded={menuOpen}

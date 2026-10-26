@@ -1,16 +1,23 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
-import type { LoginPayload } from '../types/auth'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import { createMockToken } from '../utils/mockJwt'
+import type { LoginPayload, Role } from '../types/auth'
 import './RegisterPage.css'
 
 export function LoginPage() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
     const payload: LoginPayload = { email, password }
-    console.log(payload) // TODO: gọi API đăng nhập
+    // Giả lập server: email bắt đầu bằng "recruit" => nhà tuyển dụng
+    const role: Role = email.toLowerCase().startsWith('recruit') ? 'RECRUIT' : 'USER'
+    login(createMockToken({ email: payload.email, username: payload.email.split('@')[0], role }))
+    navigate('/')
   }
 
   return (

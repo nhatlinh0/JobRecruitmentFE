@@ -1,4 +1,5 @@
-import type { NavGroup } from '../../data/navigation'
+import { Link } from 'react-router-dom'
+import { NAV_PREVIEW_LIMIT, type NavGroup } from '../../data/navigation'
 import { Icon } from '../ui/Icon'
 import './NavDropdown.css'
 
@@ -32,7 +33,7 @@ export function NavDropdown({ group, isOpen, onOpen, onClose, onToggle, onNaviga
       </button>
       <div className="mega-panel" id={panelId} hidden={!isOpen}>
         <ul className="mega-grid">
-          {group.items.map((item) => (
+          {group.items.slice(0, NAV_PREVIEW_LIMIT).map((item) => (
             <li key={item.href}>
               <a className="mega-link" href={item.href} onClick={onNavigate}>
                 {item.label}
@@ -40,6 +41,13 @@ export function NavDropdown({ group, isOpen, onOpen, onClose, onToggle, onNaviga
             </li>
           ))}
         </ul>
+        {group.items.length > NAV_PREVIEW_LIMIT && (
+          <div className="mega-footer">
+            <Link className="mega-view-all" to={`/categories/${group.id}`} onClick={onNavigate}>
+              Xem tất cả ({group.items.length})
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

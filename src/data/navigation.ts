@@ -9,6 +9,8 @@ export interface NavGroup {
   items: NavItem[]
 }
 
+export const NAV_PREVIEW_LIMIT = 20
+
 export const navItems: NavItem[] = [{ label: 'Tìm việc làm', href: '#jobs' }]
 
 type FilterParam = 'field' | 'q'

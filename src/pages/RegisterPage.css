@@ -1,16 +1,118 @@
-.register { flex: 1; display: flex; justify-content: center; align-items: center; padding: 48px 16px; }
+.register {
+  align-items: center;
+  background: radial-gradient(circle at 15% 10%, #e3f2e8 0, transparent 40%),
+    radial-gradient(circle at 90% 90%, #eaf4ee 0, transparent 40%);
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  padding: 56px 16px;
+}
+
 .register__form {
-  width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 16px;
-  padding: 32px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff;
+  background: white;
+  border: 1px solid #e7eeeb;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px #133f3016;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 440px;
+  padding: 36px;
+  width: 100%;
 }
-.register__form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+
+.register__form h1 {
+  font-size: 26px;
+  letter-spacing: -0.4px;
+  margin: 0 0 4px;
+}
+
+.register__form label {
+  color: #3f504a;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 650;
+  gap: 7px;
+}
+
 .register__form input:not([type='radio']) {
-  padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;
+  background: #fbfcf9;
+  border: 1px solid #dfe8e2;
+  border-radius: 9px;
+  font-size: 14px;
+  padding: 12px 14px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
-.register__type { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; }
-.register__type label { flex-direction: row; align-items: center; gap: 8px; margin: 4px 0; }
+
+.register__form input:not([type='radio']):focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px #25815d22;
+  outline: none;
+}
+
+.register__type {
+  border: 1px solid #dfe8e2;
+  border-radius: 10px;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px 14px;
+}
+
+.register__type legend {
+  color: #3f504a;
+  font-size: 13px;
+  font-weight: 650;
+  padding: 0 6px;
+}
+
+.register__type label {
+  align-items: center;
+  border: 1px solid #e7eeeb;
+  border-radius: 8px;
+  cursor: pointer;
+  flex-direction: row;
+  font-weight: 550;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.register__type label:has(input:checked) {
+  background: #eaf4ee;
+  border-color: var(--green);
+  color: var(--green-dark);
+}
+
+.register__type input {
+  accent-color: var(--green);
+}
+
 .register__form button {
-  padding: 12px; border: 0; border-radius: 8px; background: #2563eb; color: #fff;
-  font-weight: 600; cursor: pointer;
+  background: var(--green);
+  border: 0;
+  border-radius: 9px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 13px;
+  transition: background-color 160ms ease;
 }
-.register__hint { margin: 0; font-size: 14px; text-align: center; }
+
+.register__form button:hover {
+  background: var(--green-dark);
+}
+
+.register__hint {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+  text-align: center;
+}
+
+.register__hint a {
+  color: var(--green-dark);
+  font-weight: 700;
+  text-decoration: none;
+}
