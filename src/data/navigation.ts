@@ -11,6 +11,19 @@ export interface NavGroup {
 
 export const NAV_PREVIEW_LIMIT = 20
 
+export const companyIndustries = [
+  'Game',
+  'Tài chính - Ngân hàng',
+  'Phần mềm',
+  'Kinh doanh - Bán hàng',
+  'Thương mại điện tử',
+  'Giáo dục - Đào tạo',
+  'Y tế - Sức khỏe',
+  'Viễn thông',
+  'Logistics - Vận tải',
+  'Marketing - Truyền thông',
+] as const
+
 export const navItems: NavItem[] = [{ label: 'Tìm việc làm', href: '#jobs' }]
 
 type FilterParam = 'field' | 'q'

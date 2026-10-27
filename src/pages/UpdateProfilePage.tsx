@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import * as Slider from '@radix-ui/react-slider'
 import { navGroups } from '../data/navigation'
+import { FilePreview } from '../components/FilePreview'
+import { useFilePicker } from '../hooks/useFilePicker'
 import './UpdateProfilePage.css'
 
 const cities = [
@@ -30,7 +32,7 @@ export function UpdateProfilePage() {
   const [workType, setWorkType] = useState('')
   const [field, setField] = useState('')
   const [skill, setSkill] = useState('')
-  const [cv, setCv] = useState<File | null>(null)
+  const { file: cv, url: cvUrl, pick: pickCv } = useFilePicker()
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -258,12 +260,13 @@ export function UpdateProfilePage() {
           <label className="profile-file">
             <input
               accept="image/*,.pdf,application/pdf"
-              onChange={(event) => setCv(event.target.files?.[0] ?? null)}
+              onChange={pickCv}
               type="file"
             />
             <span className="profile-file__button">Chọn tệp</span>
             <span className="profile-file__name">{cv?.name ?? 'Chưa chọn tệp'}</span>
           </label>
+          <FilePreview file={cv} url={cvUrl} variant="document" />
           <p className="profile-form__hint">Chấp nhận tệp ảnh hoặc PDF, dung lượng tối đa 10 MB.</p>
         </div>
 
