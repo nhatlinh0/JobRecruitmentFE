@@ -40,7 +40,7 @@ export function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
 
   const items = [
     profileItem,
-    { label: 'Việc làm đã lưu', to: '/saved-jobs' },
+    ...(user.role === 'RECRUIT' ? [] : [{ label: 'Việc làm đã lưu', to: '/saved-jobs' }]),
     { label: 'Đổi mật khẩu', to: '/change-password' },
   ]
 

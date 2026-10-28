@@ -40,27 +40,31 @@ export function Header() {
     <header className="site-header" ref={headerRef}>
       <Logo />
       <nav className={`main-nav${menuOpen ? ' is-open' : ''}`} aria-label="Điều hướng chính">
-        {navItems.map((item, index) => (
-          <a
-            className={`nav-link${index === 0 ? ' active' : ''}`}
-            href={item.href}
-            key={item.href}
-            onClick={closeAll}
-          >
-            {item.label}
-          </a>
-        ))}
-        {navGroups.map((group) => (
-          <NavDropdown
-            group={group}
-            isOpen={openGroup === group.id}
-            key={group.id}
-            onClose={() => setOpenGroup(null)}
-            onNavigate={closeAll}
-            onOpen={setOpenGroup}
-            onToggle={(id) => setOpenGroup((current) => (current === id ? null : id))}
-          />
-        ))}
+        {user?.role !== 'RECRUIT' && (
+          <>
+            {navItems.map((item, index) => (
+              <a
+                className={`nav-link${index === 0 ? ' active' : ''}`}
+                href={item.href}
+                key={item.href}
+                onClick={closeAll}
+              >
+                {item.label}
+              </a>
+            ))}
+            {navGroups.map((group) => (
+              <NavDropdown
+                group={group}
+                isOpen={openGroup === group.id}
+                key={group.id}
+                onClose={() => setOpenGroup(null)}
+                onNavigate={closeAll}
+                onOpen={setOpenGroup}
+                onToggle={(id) => setOpenGroup((current) => (current === id ? null : id))}
+              />
+            ))}
+          </>
+        )}
       </nav>
       <div className="header-actions">
         {user ? (

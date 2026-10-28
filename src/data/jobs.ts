@@ -1,5 +1,26 @@
 import type { Job } from '../types/job'
 
+const defaultDescription = `Chúng tôi đang tìm kiếm một kỹ sư tài năng để gia nhập đội ngũ phát triển sản phẩm.
+
+Bạn sẽ tham gia vào các dự án công nghệ quy mô lớn, phục vụ hàng triệu người dùng trên toàn quốc.
+
+Công việc bao gồm phân tích yêu cầu, thiết kế kiến trúc, lập trình và tối ưu hiệu năng hệ thống.`
+
+const defaultRequirements = `- Tốt nghiệp chuyên ngành Công nghệ thông tin hoặc liên quan.
+- Có kinh nghiệm thực tế với các công nghệ nêu trong phần kỹ năng.
+- Tư duy logic tốt, khả năng làm việc nhóm và giao tiếp hiệu quả.
+- Ưu tiên ứng viên có kinh nghiệm làm việc trong môi trường Agile/Scrum.`
+
+const defaultBenefits = `- Mức lương cạnh tranh, xét tăng lương định kỳ 2 lần/năm.
+- Thưởng tháng 13, thưởng dự án và các ngày lễ.
+- Bảo hiểm sức khỏe cao cấp cho nhân viên và người thân.
+- Môi trường làm việc trẻ trung, năng động, nhiều cơ hội thăng tiến.`
+
+const defaultCompanyDescription = `Công ty chúng tôi là một trong những đơn vị công nghệ hàng đầu tại Việt Nam, chuyên cung cấp các giải pháp phần mềm và dịch vụ số cho hàng triệu người dùng.
+
+Với đội ngũ kỹ sư trẻ, sáng tạo và giàu kinh nghiệm, chúng tôi không ngừng đổi mới để mang lại những sản phẩm chất lượng cao.
+
+Môi trường làm việc tại công ty đề cao sự chủ động, học hỏi và phát triển bản thân. Chúng tôi luôn chào đón những ứng viên tài năng gia nhập cùng hành trình chinh phục công nghệ.`
 export const jobs: Job[] = [
   {
     id: 1,
@@ -13,6 +34,13 @@ export const jobs: Job[] = [
     skills: ['React', 'TypeScript', 'Next.js', 'Redux', 'Jest', 'GraphQL'],
     salary: { min: 35, max: 55 },
     featured: true,
+    priority: 10,
+    address: 'Tòa nhà Miss Mỹ Đình, Phạm Hùng, Nam Từ Liêm',
+    experience: { min: 3, max: 5 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Tài chính - Ngân hàng', size: '1000+', country: 'Việt Nam', address: 'Tòa nhà Miss Mỹ Đình, Phạm Hùng, Nam Từ Liêm', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 2,
@@ -26,6 +54,13 @@ export const jobs: Job[] = [
     skills: ['Node.js', 'PostgreSQL', 'AWS', 'Redis', 'Docker'],
     salary: { min: 30, max: 45 },
     featured: true,
+    priority: 10,
+    address: 'Tòa nhà Tiki, 285 Cách Mạng Tháng 8, Quận 10',
+    experience: { min: 2, max: 4 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Thương mại điện tử', size: '500-1000', country: 'Việt Nam', address: 'Tòa nhà Tiki, 285 Cách Mạng Tháng 8, Quận 10', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 3,
@@ -38,6 +73,12 @@ export const jobs: Job[] = [
     field: 'Data & AI',
     skills: ['Python', 'TensorFlow', 'PyTorch', 'LLM', 'SQL'],
     salary: null,
+    address: 'Tòa nhà Zalo, 182 Lê Đại Hành, Quận 11',
+    experience: { min: 2, max: 5 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Phần mềm', size: '1000+', country: 'Việt Nam', address: 'Tòa nhà Zalo, 182 Lê Đại Hành, Quận 11', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 4,
@@ -50,6 +91,12 @@ export const jobs: Job[] = [
     field: 'Backend Engineer',
     skills: ['Java', 'Spring Boot', 'MySQL', 'Kafka', 'Microservices', 'Git'],
     salary: { min: 15, max: 20 },
+    address: 'Tòa nhà FPT, Duy Tân, Cầu Giấy',
+    experience: { min: 1, max: 3 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Phần mềm', size: '1000+', country: 'Việt Nam', address: 'Tòa nhà FPT, Duy Tân, Cầu Giấy', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 5,
@@ -62,6 +109,12 @@ export const jobs: Job[] = [
     field: 'Fullstack Engineer',
     skills: ['React', 'JavaScript', 'Node.js', 'MongoDB'],
     salary: { min: 25, max: 40 },
+    address: 'Tòa nhà VNG, 182 Lê Đại Hành, Quận 11',
+    experience: { min: 2, max: 4 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Phần mềm', size: '1000+', country: 'Việt Nam', address: 'Tòa nhà VNG, 182 Lê Đại Hành, Quận 11', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 6,
@@ -75,6 +128,13 @@ export const jobs: Job[] = [
     skills: ['Kubernetes', 'Terraform', 'AWS', 'CI/CD', 'Linux'],
     salary: { min: 28, max: 50 },
     featured: true,
+    priority: 10,
+    address: 'Tòa nhà Shopee, 285 Cách Mạng Tháng 8, Quận 10',
+    experience: { min: 3, max: 6 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Thương mại điện tử', size: '1000+', country: 'Việt Nam', address: 'Tòa nhà Shopee, 285 Cách Mạng Tháng 8, Quận 10', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 7,
@@ -87,6 +147,12 @@ export const jobs: Job[] = [
     field: 'Mobile Engineer',
     skills: ['Kotlin', 'Android', 'Jetpack Compose', 'MVVM'],
     salary: { min: 20, max: 35 },
+    address: 'Tòa nhà VPBank, 89 Láng Hạ, Đống Đa',
+    experience: { min: 2, max: 4 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Tài chính - Ngân hàng', size: '1000+', country: 'Việt Nam', address: 'Tòa nhà VPBank, 89 Láng Hạ, Đống Đa', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 8,
@@ -99,6 +165,12 @@ export const jobs: Job[] = [
     field: 'QA Engineer',
     skills: ['Selenium', 'Cypress', 'Java', 'API Testing'],
     salary: { min: 15, max: 25 },
+    address: 'Tòa nhà Grab, 285 Cách Mạng Tháng 8, Quận 10',
+    experience: { min: 1, max: 3 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Phần mềm', size: '500-1000', country: 'Việt Nam', address: 'Tòa nhà Grab, 285 Cách Mạng Tháng 8, Quận 10', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 9,
@@ -111,6 +183,12 @@ export const jobs: Job[] = [
     field: 'Backend Engineer',
     skills: ['Java', 'Spring Boot', 'Oracle', 'Microservices'],
     salary: { min: 20, max: 30 },
+    address: 'Tòa nhà MB Bank, 21 Cát Linh, Đống Đa',
+    experience: { min: 2, max: 4 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Tài chính - Ngân hàng', size: '1000+', country: 'Việt Nam', address: 'Tòa nhà MB Bank, 21 Cát Linh, Đống Đa', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 10,
@@ -123,6 +201,12 @@ export const jobs: Job[] = [
     field: 'Frontend Engineer',
     skills: ['JavaScript', 'Vue.js', 'HTML', 'CSS'],
     salary: { min: 25, max: 45 },
+    address: 'Tòa nhà NAVER, 285 Cách Mạng Tháng 8, Quận 10',
+    experience: { min: 2, max: 5 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Phần mềm', size: '500-1000', country: 'Hàn Quốc', address: 'Tòa nhà NAVER, 285 Cách Mạng Tháng 8, Quận 10', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
   {
     id: 11,
@@ -135,5 +219,11 @@ export const jobs: Job[] = [
     field: 'Backend Engineer',
     skills: ['PHP', 'Laravel', 'MySQL', 'Redis'],
     salary: { min: 15, max: 25 },
+    address: 'Tòa nhà VNPay, 22 Láng Hạ, Đống Đa',
+    experience: { min: 1, max: 3 },
+    description: defaultDescription,
+    requirements: defaultRequirements,
+    benefits: defaultBenefits,
+    company: { industry: 'Tài chính - Ngân hàng', size: '500-1000', country: 'Việt Nam', address: 'Tòa nhà VNPay, 22 Láng Hạ, Đống Đa', phone: '024 3869 4242', description: defaultCompanyDescription },
   },
 ]

@@ -1,0 +1,102 @@
+.apply-modal {
+  align-items: center;
+  background: rgb(15 30 22 / 55%);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 100;
+}
+
+.apply-modal__dialog {
+  background: var(--page);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgb(15 30 22 / 25%);
+  max-height: calc(100vh - 40px);
+  max-width: 560px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.apply-modal__header {
+  align-items: flex-start;
+  border-bottom: 1px solid #e2ebe5;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 24px;
+}
+
+.apply-modal__header h2 {
+  color: var(--ink);
+  font-size: 20px;
+  margin: 0 0 4px;
+}
+
+.apply-modal__header p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.apply-modal__close {
+  align-items: center;
+  background: #f0f4f2;
+  border: 0;
+  border-radius: 50%;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 20px;
+  height: 36px;
+  justify-content: center;
+  line-height: 1;
+  transition: background 150ms ease;
+  width: 36px;
+}
+
+.apply-modal__close:hover {
+  background: #e2ebe5;
+}
+
+.apply-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+}
+
+.apply-modal__form .profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.apply-modal__form .profile-field > span {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.apply-modal__form .profile-field b {
+  color: #c0392b;
+}
+
+.apply-modal__form .profile-form__message {
+  margin: 0;
+}
+
+.apply-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.apply-modal__actions .button {
+  padding: 12px 28px;
+}
+
+.profile-file--disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}

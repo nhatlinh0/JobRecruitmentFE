@@ -27,7 +27,7 @@ export function useJobSearch(jobs: Job[]) {
       const matchesCity = !cityTerm || normalize(job.city).includes(cityTerm)
 
       return matchesField && matchesKeyword && matchesCity
-    })
+    }).sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
   }, [jobs, keyword, city, field])
 
   function resetFilters() {

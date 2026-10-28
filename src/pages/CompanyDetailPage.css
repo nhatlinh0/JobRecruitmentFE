@@ -1,0 +1,132 @@
+.company-detail {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 28px;
+  padding: 40px 40px 64px;
+}
+
+.company-detail__not-found {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  text-align: center;
+}
+
+.company-detail__not-found h1 {
+  color: var(--ink);
+  font-size: 28px;
+  margin: 0;
+}
+
+.company-detail__not-found p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.company-detail__header {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e2ebe5;
+  border-radius: 16px;
+  display: flex;
+  gap: 20px;
+  padding: 24px;
+}
+
+.company-detail__logo {
+  align-items: center;
+  border-radius: 14px;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 32px;
+  font-weight: 850;
+  height: 80px;
+  justify-content: center;
+  width: 80px;
+}
+
+.company-detail__logo[data-color='pink'] { background: #fff0f5; color: #d64480; }
+.company-detail__logo[data-color='blue'] { background: #edf6ff; color: #3189d8; }
+.company-detail__logo[data-color='indigo'] { background: #edf0ff; color: #596fcd; }
+.company-detail__logo[data-color='orange'] { background: #fff2e9; color: #e27843; }
+.company-detail__logo[data-color='green'] { background: #eaf6ee; color: #2c8a5a; }
+.company-detail__logo[data-color='purple'] { background: #f4eefb; color: #8453b8; }
+
+.company-detail__heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.company-detail__heading h1 {
+  color: var(--ink);
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+
+.company-detail__industry {
+  background: #eaf4ee;
+  border-radius: 6px;
+  color: var(--green-dark);
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 12px;
+}
+
+.company-detail__meta {
+  background: #fff;
+  border: 1px solid #e2ebe5;
+  border-radius: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  padding: 20px 24px;
+}
+
+.company-detail__meta-item {
+  align-items: center;
+  color: var(--ink);
+  display: inline-flex;
+  font-size: 14px;
+  gap: 8px;
+}
+
+.company-detail__meta-item svg {
+  color: var(--green-dark);
+  height: 18px;
+  width: 18px;
+}
+
+.company-detail__about {
+  background: #fff;
+  border: 1px solid #e2ebe5;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.company-detail__about h2,
+.company-detail__jobs h2 {
+  color: var(--ink);
+  font-size: 18px;
+  margin: 0 0 16px;
+}
+
+.company-detail__text {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.8;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 700px) {
+  .company-detail {
+    padding: 24px 20px 48px;
+  }
+}

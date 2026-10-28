@@ -17,6 +17,20 @@ export interface Job {
   skills: string[]
   salary: SalaryRange | null
   featured?: boolean
+  priority?: number
+  address?: string
+  experience?: SalaryRange
+  description?: string
+  requirements?: string
+  benefits?: string
+  company?: {
+    industry: string
+    size: string
+    country: string
+    address?: string
+    phone?: string
+    description?: string
+  }
 }
 
 export const ALL_FIELDS = 'Tất cả'

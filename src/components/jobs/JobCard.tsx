@@ -1,5 +1,7 @@
+import { Link } from 'react-router-dom'
 import { MAX_SKILLS, type Job } from '../../types/job'
 import { formatDate, formatSalary } from '../../utils/format'
+import { slugify } from '../../utils/slugify'
 import { Icon } from '../ui/Icon'
 import './JobCard.css'
 
@@ -50,9 +52,9 @@ export function JobCard({ job, isSaved, onToggleSave }: JobCardProps) {
 
       <div className="job-card-bottom">
         <div className="salary"><strong>{formatSalary(job.salary)}</strong></div>
-        <a className="job-card-link" href={`#job-${job.id}`}>
+        <Link className="job-card-link" to={`/jobs/${slugify(job.title)}`}>
           Xem chi tiết <Icon name="arrow" />
-        </a>
+        </Link>
       </div>
     </article>
   )

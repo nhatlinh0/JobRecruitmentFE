@@ -22,6 +22,7 @@ const workTypes = ['FULL TIME', 'PART TIME', 'REMOTE', 'HYBRID', 'FLEXIBLE'] as 
 
 const fields = navGroups.find((group) => group.id === 'by-field')?.items ?? []
 const skills = navGroups.find((group) => group.id === 'by-skill')?.items ?? []
+const MAX_SKILLS = 10
 
 export function UpdateProfilePage() {
   const [username, setUsername] = useState('')
@@ -31,7 +32,7 @@ export function UpdateProfilePage() {
   const [city, setCity] = useState('')
   const [workType, setWorkType] = useState('')
   const [field, setField] = useState('')
-  const [skill, setSkill] = useState('')
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
   const { file: cv, url: cvUrl, pick: pickCv } = useFilePicker()
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -40,6 +41,11 @@ export function UpdateProfilePage() {
     event.preventDefault()
     setError('')
     setSuccess('')
+
+    if (selectedSkills.length === 0) {
+      setError('Vui lòng chọn ít nhất một kỹ năng.')
+      return
+    }
 
     if (cv && cv.size > 10 * 1024 * 1024) {
       setError('Tệp CV vượt quá dung lượng tối đa 10 MB.')
@@ -64,7 +70,7 @@ export function UpdateProfilePage() {
       workType,
       cv,
       field,
-      skill,
+      skills: selectedSkills,
     }
 
     console.log('Thông tin hồ sơ cập nhật:', profile)
@@ -243,15 +249,47 @@ export function UpdateProfilePage() {
               </select>
             </label>
 
-            <label className="profile-field">
-              <span>Kỹ năng <b>*</b></span>
-              <select onChange={(event) => setSkill(event.target.value)} required value={skill}>
-                <option value="">Chọn kỹ năng</option>
-                {skills.map((item) => (
-                  <option key={item.label} value={item.label}>{item.label}</option>
-                ))}
+            <div className="profile-field">
+              <span>Kỹ năng <b>*</b> (tối đa {MAX_SKILLS})</span>
+              <select
+                disabled={selectedSkills.length >= MAX_SKILLS}
+                onChange={(event) => {
+                  const value = event.target.value
+                  if (value && !selectedSkills.includes(value)) {
+                    setSelectedSkills([...selectedSkills, value])
+                  }
+                  event.target.value = ''
+                }}
+                value=""
+              >
+                <option value="">
+                  {selectedSkills.length >= MAX_SKILLS ? 'Đã chọn tối đa' : 'Chọn kỹ năng'}
+                </option>
+                {skills
+                  .filter((item) => !selectedSkills.includes(item.label))
+                  .map((item) => (
+                    <option key={item.label} value={item.label}>{item.label}</option>
+                  ))}
               </select>
-            </label>
+              {selectedSkills.length > 0 && (
+                <div className="skill-chips">
+                  {selectedSkills.map((item) => (
+                    <span className="skill-chip" key={item}>
+                      {item}
+                      <button
+                        aria-label={`Xóa kỹ năng ${item}`}
+                        className="skill-chip__remove"
+                        onClick={() => setSelectedSkills(selectedSkills.filter((s) => s !== item))}
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <span className="profile-form__hint">Đã chọn {selectedSkills.length}/{MAX_SKILLS} kỹ năng.</span>
+            </div>
           </div>
         </div>
 

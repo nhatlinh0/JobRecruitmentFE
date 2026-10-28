@@ -4,10 +4,13 @@ import { FeaturedJobs } from '../components/home/FeaturedJobs'
 import { HeroSection } from '../components/home/HeroSection'
 import { TrustedCompanies } from '../components/home/TrustedCompanies'
 import { jobs } from '../data/jobs'
+import { useAuth } from '../hooks/useAuth'
 import { useJobSearch } from '../hooks/useJobSearch'
 import { useSavedJobs } from '../hooks/useSavedJobs'
+import { RecruitHome } from './RecruitHome'
 
 export function HomePage() {
+  const { user } = useAuth()
   const search = useJobSearch(jobs)
   const { savedIds, toggleSaved } = useSavedJobs()
 
@@ -18,6 +21,8 @@ export function HomePage() {
   function scrollToJobs() {
     document.getElementById('jobs')?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  if (user?.role === 'RECRUIT') return <RecruitHome />
 
   return (
     <>

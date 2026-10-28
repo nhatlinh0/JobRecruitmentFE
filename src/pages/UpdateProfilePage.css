@@ -104,6 +104,33 @@
   color: #9aa7a1;
 }
 
+.profile-textarea {
+  appearance: none;
+  background-color: #fbfcf9;
+  border: 1px solid #dfe8e2;
+  border-radius: 9px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.7;
+  min-height: 180px;
+  padding: 12px 13px;
+  resize: vertical;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  width: 100%;
+}
+
+.profile-textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px #25815d22;
+  outline: none;
+}
+
+.profile-textarea::placeholder {
+  color: #9aa7a1;
+}
+
 .profile-field input[readonly] {
   background: #f0f4f2;
   color: #66746d;
@@ -435,6 +462,46 @@
 
 .file-preview__size {
   color: var(--muted);
+}
+
+.skill-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.skill-chip {
+  align-items: center;
+  background: #e4f4ea;
+  border: 1px solid #c4e4d0;
+  border-radius: 999px;
+  color: var(--green-dark);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 6px;
+  padding: 5px 6px 5px 12px;
+}
+
+.skill-chip__remove {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: var(--green-dark);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 16px;
+  height: 20px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  width: 20px;
+}
+
+.skill-chip__remove:hover {
+  background: #c4e4d0;
 }
 
 .profile-form__message {

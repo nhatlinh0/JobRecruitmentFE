@@ -16,6 +16,7 @@ export function MyCompanyPage() {
   const [phone, setPhone] = useState('')
   const [country, setCountry] = useState('Việt Nam')
   const [industry, setIndustry] = useState('')
+  const [description, setDescription] = useState('')
   const { file: logo, url: logoUrl, pick: pickLogo } = useFilePicker()
   const { file: license, url: licenseUrl, pick: pickLicense } = useFilePicker()
   const [error, setError] = useState('')
@@ -47,7 +48,7 @@ export function MyCompanyPage() {
       return
     }
 
-    const company = { name, slug, address, size, phone, country, industry, logo, license }
+    const company = { name, slug, address, size, phone, country, industry, description, logo, license }
     console.log('Thông tin công ty:', company)
     setSuccess('Thông tin đã được kiểm tra. Chức năng cập nhật API chưa được kết nối.')
   }
@@ -130,6 +131,18 @@ export function MyCompanyPage() {
                 placeholder="Số nhà, đường, quận/huyện, tỉnh/thành phố"
                 required
                 value={address}
+              />
+            </label>
+
+            <label className="profile-field profile-field--full">
+              <span>Mô tả công ty <b>*</b></span>
+              <textarea
+                className="profile-textarea"
+                onChange={(event) => setDescription(event.target.value)}
+                placeholder={'Giới thiệu về công ty, văn hóa làm việc, sản phẩm...\n\nVí dụ:\nCông ty ABC là đơn vị tiên phong trong lĩnh vực...\n\nChúng tôi đang tìm kiếm những ứng viên...'}
+                required
+                rows={8}
+                value={description}
               />
             </label>
           </div>
