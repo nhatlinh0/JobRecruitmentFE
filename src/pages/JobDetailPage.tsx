@@ -97,14 +97,16 @@ export function JobDetailPage() {
         <h2>Kỹ năng yêu cầu</h2>
         <ul>
           {job.skills.map((skill) => (
-            <li key={skill}>{skill}</li>
+            <li key={skill}>
+              <Link to={`/skills/${slugify(skill)}`}>{skill}</Link>
+            </li>
           ))}
         </ul>
       </div>
 
       <div className="job-detail__field">
         <h2>Lĩnh vực chuyên môn</h2>
-        <span className="job-detail__field-badge">{job.field}</span>
+        <Link className="job-detail__field-badge" to={`/fields/${slugify(job.field)}`}>{job.field}</Link>
       </div>
 
       <div className="job-detail__content">

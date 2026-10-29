@@ -1,7 +1,10 @@
 import { useState, type FormEvent } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import * as Slider from '@radix-ui/react-slider'
+import { jobs } from '../data/jobs'
 import { navGroups } from '../data/navigation'
 import { slugify } from '../utils/slugify'
+import './JobPostViewPage.css'
 import './UpdateProfilePage.css'
 
 const cities = [
@@ -24,20 +27,28 @@ const skills = navGroups.find((group) => group.id === 'by-skill')?.items ?? []
 const MAX_SKILLS = 6
 
 export function JobPostCreatePage() {
-  const [title, setTitle] = useState('')
-  const [address, setAddress] = useState('')
-  const [deadline, setDeadline] = useState('')
-  const [workType, setWorkType] = useState('')
-  const [description, setDescription] = useState('')
-  const [requirements, setRequirements] = useState('')
-  const [benefits, setBenefits] = useState('')
-  const [field, setField] = useState('')
-  const [city, setCity] = useState('')
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
-  const [[experienceMin, experienceMax], setExperienceRange] = useState<[number, number]>([1, 3])
-  const [salaryNegotiable, setSalaryNegotiable] = useState(false)
-  const [[salaryMin, salaryMax], setSalaryRange] = useState<[number, number]>([5, 10])
-  const [featured, setFeatured] = useState(false)
+  const { id } = useParams<{ id: string }>()
+  const editingPost = id ? jobs.find((job) => job.id === Number(id)) : undefined
+  const isEdit = Boolean(editingPost)
+
+  const [title, setTitle] = useState(editingPost?.title ?? '')
+  const [address, setAddress] = useState(editingPost?.address ?? '')
+  const [deadline, setDeadline] = useState(editingPost?.deadline ?? '')
+  const [workType, setWorkType] = useState(editingPost?.workType.toUpperCase().replace('ONSITE', 'FULL_TIME') ?? '')
+  const [description, setDescription] = useState(editingPost?.description ?? '')
+  const [requirements, setRequirements] = useState(editingPost?.requirements ?? '')
+  const [benefits, setBenefits] = useState(editingPost?.benefits ?? '')
+  const [field, setField] = useState(editingPost?.field ?? '')
+  const [city, setCity] = useState(editingPost?.city ?? '')
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(editingPost?.skills ?? [])
+  const [[experienceMin, experienceMax], setExperienceRange] = useState<[number, number]>(
+    editingPost?.experience ? [editingPost.experience.min, editingPost.experience.max] : [1, 3],
+  )
+  const [salaryNegotiable, setSalaryNegotiable] = useState(editingPost ? editingPost.salary === null : false)
+  const [[salaryMin, salaryMax], setSalaryRange] = useState<[number, number]>(
+    editingPost?.salary ? [editingPost.salary.min, editingPost.salary.max] : [5, 10],
+  )
+  const [featured, setFeatured] = useState(editingPost?.featured ?? false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const slug = slugify(title)
@@ -77,16 +88,21 @@ export function JobPostCreatePage() {
       featured,
     }
 
-    console.log('Bài đăng tuyển dụng:', post)
-    setSuccess('Thông tin đã được kiểm tra. Chức năng đăng bài chưa được kết nối API.')
+    console.log(isEdit ? 'Cập nhật bài đăng:' : 'Bài đăng tuyển dụng:', post)
+    setSuccess(
+      isEdit
+        ? 'Thông tin đã được kiểm tra. Chức năng cập nhật chưa được kết nối API.'
+        : 'Thông tin đã được kiểm tra. Chức năng đăng bài chưa được kết nối API.',
+    )
   }
 
   return (
     <section className="profile-update">
+      {isEdit && <Link className="post-view__back" to="/recruit/posts">← Quay lại danh sách</Link>}
       <div className="profile-update__heading">
         <span className="section-kicker">NHÀ TUYỂN DỤNG</span>
-        <h1>Thêm bài đăng</h1>
-        <p>Đăng tin tuyển dụng mới để tiếp cận ứng viên phù hợp.</p>
+        <h1>{isEdit ? 'Sửa bài đăng' : 'Thêm bài đăng'}</h1>
+        <p>{isEdit ? `Cập nhật tin tuyển dụng #${id}.` : 'Đăng tin tuyển dụng mới để tiếp cận ứng viên phù hợp.'}</p>
       </div>
 
       <form className="profile-form" onSubmit={handleSubmit}>
@@ -298,11 +314,16 @@ export function JobPostCreatePage() {
           <label className="profile-checkbox">
             <input
               checked={featured}
+              disabled={isEdit}
               onChange={(event) => setFeatured(event.target.checked)}
               type="checkbox"
             />
             <span>Việc làm nổi bật</span>
-            <small>Bài đăng nổi bật sẽ được ưu tiên hiển thị lên đầu trang chủ.</small>
+            <small>
+              {isEdit
+                ? 'Không thể thay đổi trạng thái nổi bật của bài đăng đã tạo.'
+                : 'Bài đăng nổi bật sẽ được ưu tiên hiển thị lên đầu trang chủ.'}
+            </small>
           </label>
 
           <label className="profile-checkbox">
@@ -375,7 +396,9 @@ export function JobPostCreatePage() {
         {success && <p className="profile-form__message profile-form__message--success" role="status">{success}</p>}
 
         <div className="profile-form__actions">
-          <button className="button button-primary profile-form__submit" type="submit">Đăng bài tuyển dụng</button>
+          <button className="button button-primary profile-form__submit" type="submit">
+            {isEdit ? 'Lưu thay đổi' : 'Đăng bài tuyển dụng'}
+          </button>
         </div>
       </form>
     </section>

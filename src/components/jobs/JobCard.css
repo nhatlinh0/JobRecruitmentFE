@@ -9,6 +9,38 @@
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
+.job-card--featured {
+  background:
+    radial-gradient(120% 140% at 100% 0%, #fef3d8 0%, transparent 45%),
+    linear-gradient(165deg, #fffdf7 0%, #fff 60%);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  box-shadow:
+    0 0 0 1px #ecd9ae,
+    0 10px 26px #c99a3f1f,
+    inset 0 1px 0 #ffffffcc;
+  position: relative;
+}
+
+.job-card--featured::before {
+  background: linear-gradient(90deg, #f7b733, #e8930c);
+  border-radius: 11px 0 11px 0;
+  content: '';
+  height: 4px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 72px;
+}
+
+.job-card--featured:hover {
+  box-shadow:
+    0 0 0 1px #e2c37f,
+    0 18px 40px #c99a3f33,
+    inset 0 1px 0 #ffffffcc;
+  transform: translateY(-3px);
+}
+
 .job-card:hover {
   border-color: #c9ded1;
   box-shadow: 0 12px 28px #234d3710;
@@ -55,13 +87,17 @@
 
 .featured-label {
   align-items: center;
-  background: #fff5e8;
-  border-radius: 4px;
-  color: #bd8140;
+  background: linear-gradient(135deg, #f9c04a 0%, #e8930c 60%, #d67f06 100%);
+  border-radius: 999px;
+  box-shadow: 0 3px 8px #e8930c40, inset 0 1px 0 #ffffff55;
+  color: #fff;
   display: inline-flex;
   font-size: 9px;
-  gap: 3px;
-  padding: 3px 5px;
+  font-weight: 800;
+  gap: 4px;
+  letter-spacing: 0.5px;
+  padding: 4px 9px;
+  text-transform: uppercase;
 }
 
 .featured-label svg {
@@ -115,6 +151,11 @@
   font-size: 10px;
   font-weight: 700;
   padding: 4px 8px;
+  text-decoration: none;
+}
+
+.job-field:hover {
+  background: #d6eade;
 }
 
 .job-meta,
@@ -154,9 +195,33 @@
 .job-skills li {
   background: #f2f5f3;
   border-radius: 4px;
-  color: #5d6b64;
   font-size: 10px;
+}
+
+.job-skills li a {
+  color: #5d6b64;
+  display: block;
   padding: 5px 8px;
+  text-decoration: none;
+}
+
+.job-skills li:hover {
+  background: #e4f4ea;
+}
+
+.job-skills li:hover a {
+  color: var(--green-dark);
+}
+
+.job-card--featured .salary strong {
+  background: linear-gradient(90deg, #b87708, #e8930c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.job-card--featured .job-card-bottom {
+  border-top-color: #f3e8cf;
 }
 
 .job-card-bottom {

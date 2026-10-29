@@ -1,8 +1,9 @@
+import { slugify } from '../utils/slugify'
+
 export interface NavItem {
   label: string
   href: string
 }
-
 export interface NavGroup {
   id: string
   label: string
@@ -32,6 +33,14 @@ function filterLink(param: FilterParam, value: string): NavItem {
   return { label: value, href: `/?${param}=${encodeURIComponent(value)}#jobs` }
 }
 
+function skillLink(value: string): NavItem {
+  return { label: value, href: `/skills/${slugify(value)}` }
+}
+
+function fieldLink(value: string): NavItem {
+  return { label: value, href: `/fields/${slugify(value)}` }
+}
+
 export const navGroups: NavGroup[] = [
   {
     id: 'by-field',
@@ -49,7 +58,7 @@ export const navGroups: NavGroup[] = [
       'UI/UX Designer',
       'Security Engineer',
       'Project Manager',
-    ].map((value) => filterLink('field', value)),
+    ].map((value) => fieldLink(value)),
   },
   {
     id: 'by-skill',
@@ -67,7 +76,7 @@ export const navGroups: NavGroup[] = [
       'Kotlin',
       'AWS',
       'Docker',
-    ].map((value) => filterLink('q', value)),
+    ].map((value) => skillLink(value)),
   },
   {
     id: 'by-company',

@@ -23,7 +23,11 @@ export function NavGroupPage() {
       <ul className="nav-group-page__grid">
         {group.items.map((item) => (
           <li key={item.href}>
-            <a href={item.href}>{item.label}</a>
+            {item.href.startsWith('/') ? (
+              <Link to={item.href}>{item.label}</Link>
+            ) : (
+              <a href={item.href}>{item.label}</a>
+            )}
           </li>
         ))}
       </ul>

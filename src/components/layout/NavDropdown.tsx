@@ -35,9 +35,15 @@ export function NavDropdown({ group, isOpen, onOpen, onClose, onToggle, onNaviga
         <ul className="mega-grid">
           {group.items.slice(0, NAV_PREVIEW_LIMIT).map((item) => (
             <li key={item.href}>
-              <a className="mega-link" href={item.href} onClick={onNavigate}>
-                {item.label}
-              </a>
+              {item.href.startsWith('/') ? (
+                <Link className="mega-link" to={item.href} onClick={onNavigate}>
+                  {item.label}
+                </Link>
+              ) : (
+                <a className="mega-link" href={item.href} onClick={onNavigate}>
+                  {item.label}
+                </a>
+              )}
             </li>
           ))}
         </ul>

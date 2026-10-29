@@ -163,10 +163,19 @@
 .job-detail__skills li {
   background: #eaf4ee;
   border-radius: 6px;
-  color: var(--green-dark);
   font-size: 13px;
   font-weight: 600;
+}
+
+.job-detail__skills li a {
+  color: var(--green-dark);
+  display: block;
   padding: 6px 12px;
+  text-decoration: none;
+}
+
+.job-detail__skills li:hover {
+  background: #d6eade;
 }
 
 .job-detail__field-badge {
@@ -177,6 +186,11 @@
   font-size: 14px;
   font-weight: 600;
   padding: 8px 16px;
+  text-decoration: none;
+}
+
+.job-detail__field-badge:hover {
+  background: #d6eade;
 }
 
 .job-detail__content {

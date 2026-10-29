@@ -15,7 +15,7 @@ export function JobCard({ job, isSaved, onToggleSave }: JobCardProps) {
   const skills = job.skills.slice(0, MAX_SKILLS)
 
   return (
-    <article className="job-card">
+    <article className={`job-card${job.featured ? ' job-card--featured' : ''}`}>
       <div className="job-card-top">
         <div className={`company-mark ${job.companyColor}`} aria-hidden="true">
           {job.companyName.charAt(0).toUpperCase()}
@@ -38,7 +38,7 @@ export function JobCard({ job, isSaved, onToggleSave }: JobCardProps) {
       </div>
 
       <h3>{job.title}</h3>
-      <span className="job-field">{job.field}</span>
+      <Link className="job-field" to={`/fields/${slugify(job.field)}`}>{job.field}</Link>
 
       <ul className="job-meta">
         <li><Icon name="location" />{job.city}</li>
@@ -47,7 +47,11 @@ export function JobCard({ job, isSaved, onToggleSave }: JobCardProps) {
       </ul>
 
       <ul className="job-skills" aria-label="Kỹ năng yêu cầu">
-        {skills.map((skill) => <li key={skill}>{skill}</li>)}
+        {skills.map((skill) => (
+          <li key={skill}>
+            <Link to={`/skills/${slugify(skill)}`}>{skill}</Link>
+          </li>
+        ))}
       </ul>
 
       <div className="job-card-bottom">
