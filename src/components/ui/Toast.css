@@ -1,0 +1,8 @@
+.toast-region { position: fixed; top: 24px; right: 24px; z-index: 1000; width: min(420px, calc(100vw - 32px)); }
+.toast { display: flex; align-items: flex-start; gap: 12px; padding: 18px; border: 1px solid #cde6d5; border-left: 4px solid var(--green); border-radius: 12px; background: white; color: var(--ink); box-shadow: 0 12px 36px #173f3526; }
+.toast--error { border-color: #f3d1cc; border-left-color: #c0392b; }
+.toast__icon { display: grid; place-items: center; flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; color: var(--green-dark); background: #eaf6ee; font-weight: 700; }
+.toast--error .toast__icon { color: #c0392b; background: #fdecea; }
+.toast strong { font-size: 14px; }
+.toast p { font-size: 13px; line-height: 1.6; margin: 6px 0 0; overflow-wrap: anywhere; }
+.toast button { border: 0; background: transparent; color: var(--muted); font-size: 22px; cursor: pointer; margin-left: auto; }

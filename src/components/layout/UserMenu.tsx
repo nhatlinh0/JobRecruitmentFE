@@ -65,7 +65,7 @@ export function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
         type="button"
       >
         <img alt="" className="user-menu__avatar" src={user.avatar || DEFAULT_AVATAR} />
-        <span className="user-menu__name">{user.username}</span>
+        <span className="user-menu__name">{user.username || 'Tài khoản'}</span>
         <Icon name="chevron" className="user-menu__chevron" />
       </button>
       {open && (

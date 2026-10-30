@@ -9,7 +9,7 @@ export interface RegisterPayload {
   email: string
   password: string
   username: string
-  role: Role
+  roleId: 1 | 3
 }
 
 export interface CreateStaffPayload {

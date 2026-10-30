@@ -2,17 +2,38 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { UserMenu } from './UserMenu'
-import { navGroups, navItems } from '../../data/navigation'
+import { navItems } from '../../data/navigation'
+import { fetchPublicNavigation, type PublicNavItem } from '../../services/publicNavigation'
 import { Icon } from '../ui/Icon'
 import { Logo } from '../ui/Logo'
 import { NavDropdown } from './NavDropdown'
 import './Header.css'
+
+const publicGroups = [
+  { id: 'by-field', label: 'Việc làm theo chuyên môn', endpoint: 'domains' },
+  { id: 'by-skill', label: 'Việc làm theo kỹ năng', endpoint: 'skills' },
+  { id: 'by-company', label: 'Việc làm theo công ty', endpoint: 'companies' },
+]
+interface MenuData { items: PublicNavItem[]; loading: boolean; error: string }
 
 export function Header() {
   const { user } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [openGroup, setOpenGroup] = useState<string | null>(null)
   const headerRef = useRef<HTMLElement>(null)
+  const [menus, setMenus] = useState<Record<string, MenuData>>({})
+
+  useEffect(() => {
+    const controller = new AbortController()
+    for (const group of publicGroups) {
+      fetchPublicNavigation(group.endpoint, controller.signal).then((items) => {
+        if (!controller.signal.aborted) setMenus((current) => ({ ...current, [group.id]: { items, loading: false, error: '' } }))
+      }).catch((error: unknown) => {
+        if (!controller.signal.aborted) setMenus((current) => ({ ...current, [group.id]: { items: [], loading: false, error: error instanceof Error ? error.message : 'Không thể tải danh sách.' } }))
+      })
+    }
+    return () => controller.abort()
+  }, [])
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -52,9 +73,12 @@ export function Header() {
                 {item.label}
               </a>
             ))}
-            {navGroups.map((group) => (
+            {publicGroups.map((group) => (
               <NavDropdown
-                group={group}
+                group={{ id: group.id, label: group.label, items: [] }}
+                publicItems={menus[group.id]?.items ?? []}
+                loading={menus[group.id]?.loading ?? !menus[group.id]}
+                error={menus[group.id]?.error}
                 isOpen={openGroup === group.id}
                 key={group.id}
                 onClose={() => setOpenGroup(null)}

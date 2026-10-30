@@ -1,28 +1,62 @@
-import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { createMockToken } from '../utils/mockJwt'
+import { useCallback, useRef, useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
+import { Toast, type ToastMessage } from '../components/ui/Toast'
 import type { RegisterPayload, Role } from '../types/auth'
 import './RegisterPage.css'
 
 export function RegisterPage() {
-  const { login } = useAuth()
-  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
   const [role, setRole] = useState<Role>('USER')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const submitting = useRef(false)
+  const [notification, setNotification] = useState<ToastMessage | null>(null)
+  const closeToast = useCallback(() => setNotification(null), [])
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    const payload: RegisterPayload = { email, password, username, role }
-    // Giả lập server: đăng ký xong trả token và đăng nhập luôn
-    login(createMockToken({ email: payload.email, username: payload.username, role: payload.role }))
-    navigate('/')
+    if (submitting.current) return
+    if (!username.trim()) {
+      setNotification({ type: 'error', message: 'Vui lòng nhập họ tên.' })
+      return
+    }
+    const payload: RegisterPayload = { email: email.trim(), password, username: username.trim(), roleId: role === 'USER' ? 1 : 3 }
+    submitting.current = true
+    setIsSubmitting(true)
+    setNotification(null)
+    try {
+      const response = await fetch('/api/public/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(15000),
+      })
+      if (!response.ok) {
+        const text = await response.text()
+        let message = `Đăng ký thất bại (HTTP ${response.status}). Vui lòng thử lại.`
+        try {
+          const body: unknown = JSON.parse(text)
+          if (body && typeof body === 'object' && 'message' in body && typeof body.message === 'string') message = body.message
+        } catch {
+          if (text && !text.trimStart().startsWith('<')) message = text.slice(0, 300)
+        }
+        setNotification({ type: 'error', message })
+        return
+      }
+      setNotification({ type: 'success', message: 'Đăng ký thành công! Bạn có thể đăng nhập bằng tài khoản vừa tạo.' })
+      setPassword('')
+    } catch {
+      setNotification({ type: 'error', message: 'Không thể kết nối máy chủ hoặc yêu cầu đã hết thời gian chờ. Vui lòng thử lại.' })
+    } finally {
+      submitting.current = false
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <div className="register">
+      <Toast notification={notification} onClose={closeToast} />
       <form className="register__form" onSubmit={handleSubmit}>
         <h1>Đăng ký</h1>
 
@@ -69,7 +103,7 @@ export function RegisterPage() {
           </label>
         </fieldset>
 
-        <button type="submit">Đăng ký</button>
+        <button type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>{isSubmitting ? 'Đang đăng ký...' : 'Đăng ký'}</button>
         <p className="register__hint">
           Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
         </p>

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { NAV_PREVIEW_LIMIT, type NavGroup } from '../../data/navigation'
 import { Icon } from '../ui/Icon'
 import './NavDropdown.css'
+import type { PublicNavItem } from '../../services/publicNavigation'
 
 interface NavDropdownProps {
   group: NavGroup
@@ -10,9 +11,12 @@ interface NavDropdownProps {
   onClose: () => void
   onToggle: (id: string) => void
   onNavigate: () => void
+  publicItems?: PublicNavItem[]
+  loading?: boolean
+  error?: string
 }
 
-export function NavDropdown({ group, isOpen, onOpen, onClose, onToggle, onNavigate }: NavDropdownProps) {
+export function NavDropdown({ group, isOpen, onOpen, onClose, onToggle, onNavigate, publicItems, loading, error }: NavDropdownProps) {
   const panelId = `${group.id}-panel`
 
   return (
@@ -32,6 +36,9 @@ export function NavDropdown({ group, isOpen, onOpen, onClose, onToggle, onNaviga
         <Icon name="chevron" className="nav-chevron" />
       </button>
       <div className="mega-panel" id={panelId} hidden={!isOpen}>
+        {publicItems !== undefined ? <>
+          {loading ? <p className="mega-message" role="status">Đang tải...</p> : error ? <p className="mega-message" role="status">{error}</p> : publicItems.length === 0 ? <p className="mega-message">Chưa có dữ liệu.</p> : <ul className="mega-grid mega-grid--public">{publicItems.map((item) => <li key={item.id}><span className="mega-link mega-link--display">{item.label}</span></li>)}</ul>}
+        </> : <>
         <ul className="mega-grid">
           {group.items.slice(0, NAV_PREVIEW_LIMIT).map((item) => (
             <li key={item.href}>
@@ -54,6 +61,7 @@ export function NavDropdown({ group, isOpen, onOpen, onClose, onToggle, onNaviga
             </Link>
           </div>
         )}
+        </>}
       </div>
     </div>
   )

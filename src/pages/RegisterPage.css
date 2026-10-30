@@ -104,6 +104,11 @@
   background: var(--green-dark);
 }
 
+.register__form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .register__hint {
   color: var(--muted);
   font-size: 13px;
