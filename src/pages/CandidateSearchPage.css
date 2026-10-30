@@ -1,0 +1,19 @@
+.candidate-search__results {
+  margin-top: 32px;
+}
+
+.candidate-search__results > p {
+  color: var(--muted);
+}
+
+.candidate-search__results .post-list__card {
+  overflow-x: auto;
+}
+
+.candidate-search__cv {
+  margin-top: 24px;
+}
+
+.candidate-search__cv p {
+  overflow-wrap: anywhere;
+}

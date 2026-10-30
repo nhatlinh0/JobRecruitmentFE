@@ -1,8 +1,11 @@
 export type IconName =
+  | 'filter'
   | 'arrow'
   | 'bookmark'
   | 'briefcase'
   | 'calendar'
+  | 'check'
+  | 'close'
   | 'chevron'
   | 'code'
   | 'eye'
@@ -16,6 +19,9 @@ export type IconName =
   | 'trend'
 
 const iconPaths: Record<IconName, string> = {
+  filter: 'M4 7h16M7 12h10M10 17h4M8 4v6m8-1v6m-4-1v6',
+  check: 'm5 12 4 4L19 6',
+  close: 'm6 6 12 12M6 18 18 6',
   arrow: 'M7 17 17 7M7 7h10v10',
   bookmark: 'M6 4.75A1.75 1.75 0 0 1 7.75 3h8.5A1.75 1.75 0 0 1 18 4.75V21l-6-4-6 4V4.75Z',
   briefcase: 'M3 8.5h18v11H3zM8 8.5V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2.5M3 12h18m-11 0v2h4v-2',

@@ -4,6 +4,11 @@
   padding: 82px 36px 74px;
 }
 
+.jobs-filter-trigger { gap: 8px; padding: 10px 16px; flex-shrink: 0; }
+.jobs-filter-trigger svg { width: 18px; height: 18px; }
+.jobs-filter-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; color: var(--muted); font-size: 13px; }
+.jobs-filter-summary button { background: none; border: 0; color: var(--green-dark); cursor: pointer; text-decoration: underline; }
+
 .text-link {
   align-items: center;
   color: var(--green);

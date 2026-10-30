@@ -11,3 +11,9 @@ export interface RegisterPayload {
   username: string
   role: Role
 }
+
+export interface CreateStaffPayload {
+  email: string
+  username: string
+  role: 'RECRUIT'
+}

@@ -100,7 +100,7 @@ export function JobPostListPage() {
                       >
                         <Icon name="trash" />
                       </button>
-                      <Link className="post-actions__applicants" to={`/recruit/posts`}>
+                      <Link className="post-actions__applicants" to={`/recruit/posts/${post.id}/applicants`}>
                         DS ứng tuyển
                       </Link>
                     </div>

@@ -3,6 +3,7 @@ import { CtaBanner } from '../components/home/CtaBanner'
 import { FeaturedJobs } from '../components/home/FeaturedJobs'
 import { HeroSection } from '../components/home/HeroSection'
 import { TrustedCompanies } from '../components/home/TrustedCompanies'
+import { CompanyDirectory } from '../components/home/CompanyDirectory'
 import { jobs } from '../data/jobs'
 import { useAuth } from '../hooks/useAuth'
 import { useJobSearch } from '../hooks/useJobSearch'
@@ -34,6 +35,7 @@ export function HomePage() {
         onSearch={scrollToJobs}
       />
       <TrustedCompanies />
+      <CompanyDirectory />
       <FeaturedJobs
         allJobs={jobs}
         field={search.field}

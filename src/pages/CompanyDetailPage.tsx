@@ -1,15 +1,19 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { JobList } from '../components/jobs/JobList'
+import { Pagination } from '../components/ui/Pagination'
 import { jobs } from '../data/jobs'
 import { useSavedJobs } from '../hooks/useSavedJobs'
 import { slugify } from '../utils/slugify'
 import { Icon } from '../components/ui/Icon'
 import './CompanyDetailPage.css'
 
+const PAGE_SIZE = 6
+
 export function CompanyDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const { savedIds, toggleSaved } = useSavedJobs()
+  const [pagination, setPagination] = useState({ slug, page: 0 })
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -17,6 +21,9 @@ export function CompanyDetailPage() {
 
   const companyJobs = jobs.filter((job) => slugify(job.companyName) === slug)
   const firstJob = companyJobs[0]
+  const totalPages = Math.ceil(companyJobs.length / PAGE_SIZE)
+  const page = pagination.slug === slug ? Math.max(0, Math.min(pagination.page, totalPages - 1)) : 0
+  const content = companyJobs.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
 
   if (!firstJob) {
     return (
@@ -72,7 +79,8 @@ export function CompanyDetailPage() {
 
       <div className="company-detail__jobs">
         <h2>Vị trí đang tuyển ({companyJobs.length})</h2>
-        <JobList jobs={companyJobs} onReset={() => {}} onToggleSave={toggleSaved} savedIds={savedIds} />
+        <JobList jobs={content} onReset={() => {}} onToggleSave={toggleSaved} savedIds={savedIds} />
+        <Pagination page={page} totalPages={totalPages} totalElements={companyJobs.length} label="việc làm" onChange={(nextPage) => setPagination({ slug, page: nextPage })} />
       </div>
     </section>
   )

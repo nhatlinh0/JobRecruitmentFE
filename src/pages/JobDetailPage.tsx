@@ -60,7 +60,7 @@ export function JobDetailPage() {
           >
             Ứng tuyển ngay
           </button>
-          <button aria-label="Lưu công việc" className="job-detail__save" type="button">
+          <button aria-label={savedIds.includes(job.id) ? 'Bỏ lưu công việc' : 'Lưu công việc'} aria-pressed={savedIds.includes(job.id)} onClick={() => toggleSaved(job.id)} className="job-detail__save" type="button">
             <Icon name="bookmark" />
           </button>
         </div>

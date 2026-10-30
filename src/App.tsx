@@ -6,12 +6,18 @@ import { MyCompanyPage } from './pages/MyCompanyPage'
 import { JobPostCreatePage } from './pages/JobPostCreatePage'
 import { JobPostListPage } from './pages/JobPostListPage'
 import { JobPostViewPage } from './pages/JobPostViewPage'
+import { JobApplicantsPage } from './pages/JobApplicantsPage'
 import { JobDetailPage } from './pages/JobDetailPage'
 import { CompanyDetailPage } from './pages/CompanyDetailPage'
 import { FieldJobsPage, SkillJobsPage } from './pages/TagJobsPage'
 import { NavGroupPage } from './pages/NavGroupPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { UpdateProfilePage } from './pages/UpdateProfilePage'
+import { StaffCreatePage } from './pages/StaffCreatePage'
+import { StaffListPage } from './pages/StaffListPage'
+import { CandidateSearchPage } from './pages/CandidateSearchPage'
+import { ChangePasswordPage } from './pages/ChangePasswordPage'
+import { SavedJobsPage } from './pages/SavedJobsPage'
 
 function App() {
   return (
@@ -20,11 +26,17 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route path="/saved-jobs" element={<SavedJobsPage />} />
         <Route path="/categories/:groupId" element={<NavGroupPage />} />
         <Route path="/update-profile" element={<UpdateProfilePage />} />
         <Route path="/my-company" element={<MyCompanyPage />} />
+        <Route path="/recruit/staff/new" element={<StaffCreatePage />} />
+        <Route path="/recruit/staff" element={<StaffListPage />} />
+        <Route path="/recruit/candidates" element={<CandidateSearchPage />} />
         <Route path="/recruit/posts/new" element={<JobPostCreatePage />} />
         <Route path="/recruit/posts/:id/edit" element={<JobPostCreatePage />} />
+        <Route path="/recruit/posts/:id/applicants" element={<JobApplicantsPage />} />
         <Route path="/recruit/posts/:id" element={<JobPostViewPage />} />
         <Route path="/recruit/posts" element={<JobPostListPage />} />
         <Route path="/jobs/:slug" element={<JobDetailPage />} />

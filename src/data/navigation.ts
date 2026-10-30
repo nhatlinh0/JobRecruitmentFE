@@ -25,12 +25,10 @@ export const companyIndustries = [
   'Marketing - Truyền thông',
 ] as const
 
-export const navItems: NavItem[] = [{ label: 'Tìm việc làm', href: '#jobs' }]
+export const navItems: NavItem[] = [{ label: 'Tìm việc làm', href: '/' }]
 
-type FilterParam = 'field' | 'q'
-
-function filterLink(param: FilterParam, value: string): NavItem {
-  return { label: value, href: `/?${param}=${encodeURIComponent(value)}#jobs` }
+function companyLink(value: string): NavItem {
+  return { label: value, href: `/companies/${slugify(value)}` }
 }
 
 function skillLink(value: string): NavItem {
@@ -94,6 +92,6 @@ export const navGroups: NavGroup[] = [
       'VPBank',
       'Viettel',
       'VNPay',
-    ].map((value) => filterLink('q', value)),
+    ].map((value) => companyLink(value)),
   },
 ]

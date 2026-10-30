@@ -11,7 +11,7 @@ const companies = [
 
 export function TrustedCompanies() {
   return (
-    <section className="trust-strip" id="companies" aria-label="Đối tác tuyển dụng">
+    <section className="trust-strip" aria-label="Đối tác tuyển dụng">
       <p>ĐƯỢC TIN DÙNG BỞI NHỮNG ĐỘI NGŨ TUYỆT VỜI</p>
       <div className="company-logos">
         {companies.map((company) => (
