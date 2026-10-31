@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import * as Slider from '@radix-ui/react-slider'
 import { useAuth } from '../hooks/useAuth'
-import { fetchProfileOptions, parseUserInfo, profileRequest, type ProfileOption, type UserInfoPayload } from '../services/userInfo'
+import { createUserInfoFormData, fetchProfileOptions, parseUserInfo, profileRequest, type ProfileOption, type UserInfoPayload } from '../services/userInfo'
 import { useFilePicker } from '../hooks/useFilePicker'
 import { FilePreview } from '../components/FilePreview'
 import './UpdateProfilePage.css'
@@ -67,7 +67,7 @@ export function UpdateProfilePage() {
       setCity(info?.city ?? '')
       setWorkType(info?.workingType ?? '')
       setField(info?.domainId ? String(info.domainId) : '')
-      setSelectedSkills(info?.skill_ids ?? [])
+      setSelectedSkills(info?.skillIds ?? [])
       setSkills(info?.skills ?? [])
       setSkillsLoading(Boolean(info?.domainId))
       setSkillsError('')
@@ -109,7 +109,7 @@ export function UpdateProfilePage() {
       return
     }
     if (cv) {
-      if (cv.type !== 'application/pdf' && !cv.type.startsWith('image/')) { setError('CV phải là tệp ảnh hoặc PDF.'); return }
+      if (!cv.type.startsWith('image/')) { setError('Chỉ chấp nhận tệp ảnh, không hỗ trợ PDF.'); return }
       if (cv.size > 10 * 1024 * 1024) { setError('Tệp CV vượt quá dung lượng tối đa 10 MB.'); return }
     }
     if (!field || selectedSkills.length === 0) {
@@ -126,18 +126,17 @@ export function UpdateProfilePage() {
       experienceMin,
       experienceMax,
       workingType: workType,
-      // Đường dẫn demo; thay bằng URL cloud do server trả về khi có API upload.
-      image: '/demo/cv/sample.pdf',
+      image: cv,
       domainId: Number(field),
-      skill_ids: selectedSkills,
+      skillIds: selectedSkills,
     }
 
     savingRef.current = true
     setSaving(true)
     try {
-      await profileRequest('user-infos', token, { method: exists ? 'PUT' : 'POST', body: JSON.stringify(profile) })
+      await profileRequest('user-infos', token, { method: exists ? 'PUT' : 'POST', body: createUserInfoFormData(profile) })
       setExists(true)
-      setSuccess('Đã lưu thông tin hồ sơ. Trường image sử dụng đường dẫn demo cố định.')
+      setSuccess('Đã lưu thông tin hồ sơ.')
     } catch (error) { setError(error instanceof Error ? error.message : 'Không thể lưu hồ sơ.') }
     finally { savingRef.current = false; setSaving(false) }
   }
@@ -369,13 +368,20 @@ export function UpdateProfilePage() {
         <div className="profile-form__section">
           <h2>CV / hồ sơ đính kèm</h2>
           <label className="profile-file">
-            <input type="file" accept="image/*,.pdf,application/pdf" onChange={pickCv} />
+            <input type="file" accept="image/*" onChange={(event) => {
+              const file = event.target.files?.[0]
+              if (file && (!file.type.startsWith('image/') || file.size > 10 * 1024 * 1024)) {
+                setError(!file.type.startsWith('image/') ? 'Chỉ chấp nhận tệp ảnh, không hỗ trợ PDF.' : 'Tệp ảnh vượt quá dung lượng tối đa 10 MB.')
+                event.target.value = ''
+              } else { setError('') }
+              pickCv(event)
+            }} />
             <span className="profile-file__button">Chọn tệp</span>
             <span className="profile-file__name">{cv?.name ?? 'Chưa chọn tệp'}</span>
           </label>
           <FilePreview file={cv} url={cvUrl} variant="document" />
           {!cv && /^https?:\/\//i.test(image) && <a href={image} target="_blank" rel="noopener noreferrer">Xem CV hiện tại</a>}
-          <p className="profile-form__hint">Chấp nhận ảnh hoặc PDF, tối đa 10 MB. Khi lưu, hệ thống gửi đường dẫn CV demo; tệp chưa được upload.</p>
+          <p className="profile-form__hint">Chỉ chấp nhận tệp ảnh, tối đa 10 MB. Không hỗ trợ PDF. Ảnh mới được gửi cùng thông tin hồ sơ khi lưu.</p>
         </div>
 
         {error && <p className="profile-form__message profile-form__message--error" role="alert">{error}</p>}

@@ -7,15 +7,31 @@ export interface UserInfoPayload {
   experienceMin: number
   workingType: string
   city: string
-  image: string
+  image: File | null
   domainId: number
   username: string
-  skill_ids: number[]
+  skillIds: number[]
 }
 
-export interface UserInfoResponse extends UserInfoPayload {
+export interface UserInfoResponse extends Omit<UserInfoPayload, 'image'> {
+  image: string
   domain: ProfileOption | null
   skills: ProfileOption[]
+}
+
+export function createUserInfoFormData(profile: UserInfoPayload): FormData {
+  const form = new FormData()
+  for (const [key, value] of Object.entries(profile)) {
+    if (value === null) continue
+    if (key === 'skillIds') {
+      profile.skillIds.forEach((id) => form.append('skillIds', String(id)))
+    } else if (value instanceof File) {
+      form.append(key, value, value.name)
+    } else {
+      form.append(key, String(value))
+    }
+  }
+  return form
 }
 
 export function unwrap(body: unknown): unknown {
@@ -61,15 +77,15 @@ export async function fetchProfileOptions(path: string, token: string, signal: A
 export async function profileRequest(path: string, token: string, options: RequestInit = {}): Promise<unknown> {
   const response = await fetch(`/api/api/v1/${path}`, {
     ...options,
-    headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, ...(options.body ? { 'Content-Type': 'application/json' } : {}) },
+    headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, ...(options.body && !(options.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}) },
     signal: options.signal ?? AbortSignal.timeout(15000),
   })
   if (path === 'user-infos' && (!options.method || options.method === 'GET') && (response.status === 204 || response.status === 404)) return null
   const text = await response.text()
   let body: unknown = null
-  if (text) { try { body = JSON.parse(text) } catch { if (response.ok) throw new Error('Server trả về dữ liệu không hợp lệ.') } }
+  if (text) { try { body = JSON.parse(text) } catch { if (response.ok && (!options.method || options.method === 'GET')) throw new Error('Server trả về dữ liệu không hợp lệ.'); body = text } }
   if (!response.ok) {
-    const message = body && typeof body === 'object' && 'message' in body && typeof body.message === 'string' ? body.message : `Yêu cầu thất bại (HTTP ${response.status}).`
+    const message = body && typeof body === 'object' && 'message' in body && typeof body.message === 'string' ? body.message : typeof body === 'string' && !body.trimStart().startsWith('<') ? body.slice(0, 300) : `Yêu cầu thất bại (HTTP ${response.status}).`
     throw new Error(message)
   }
   return unwrap(body)
@@ -84,7 +100,7 @@ export function parseUserInfo(body: unknown): UserInfoResponse | null {
   const domain = info.domain && typeof info.domain === 'object' ? record(info.domain) : null
   const domainId = Number(domain?.id ?? info.domainId ?? 0)
   if (!Number.isInteger(domainId) || domainId < 0) throw new Error('Chuyên môn trong hồ sơ không có ID hợp lệ.')
-  const skillValues = info.skills ?? info.skill_ids ?? []
+  const skillValues = info.skills ?? info.skillIds ?? info.skill_ids ?? []
   if (!Array.isArray(skillValues)) throw new Error('Dữ liệu kỹ năng trong hồ sơ không hợp lệ.')
   const skills = skillValues.every((skill) => skill && typeof skill === 'object') ? parseOptions(skillValues) : []
   const skillIds = skills.length ? skills.map((skill) => skill.id) : skillValues.map(Number)
@@ -102,6 +118,6 @@ export function parseUserInfo(body: unknown): UserInfoResponse | null {
     salaryMax: typeof info.salaryMax === 'number' ? info.salaryMax : null,
     experienceMin: Number(info.experienceMin ?? 0),
     experienceMax: Number(info.experienceMax ?? 3),
-    skill_ids: [...new Set(skillIds)],
+    skillIds: [...new Set(skillIds)],
   }
 }
