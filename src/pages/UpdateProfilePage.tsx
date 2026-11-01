@@ -35,6 +35,7 @@ export function UpdateProfilePage() {
   const [field, setField] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<number[]>([])
   const [image, setImage] = useState('')
+  const [profileExists, setProfileExists] = useState(false)
   const { file: cv, url: cvUrl, pick: pickCv } = useFilePicker()
   const [fields, setFields] = useState<ProfileOption[]>([])
   const [skills, setSkills] = useState<ProfileOption[]>([])
@@ -42,7 +43,6 @@ export function UpdateProfilePage() {
   const [ready, setReady] = useState(false)
   const [skillsLoading, setSkillsLoading] = useState(false)
   const [skillsError, setSkillsError] = useState('')
-  const [exists, setExists] = useState(false)
   const [saving, setSaving] = useState(false)
   const savingRef = useRef(false)
   const [retry, setRetry] = useState(0)
@@ -55,11 +55,13 @@ export function UpdateProfilePage() {
     const controller = new AbortController()
     Promise.all([
       fetchProfileOptions('domains', token, controller.signal),
-      profileRequest('user-infos', token, { signal: controller.signal }).then(parseUserInfo),
-    ]).then(([domains, info]) => {
+      profileRequest('user-infos', token, { signal: controller.signal }),
+    ]).then(([domains, response]) => {
       if (controller.signal.aborted) return
+      const info = parseUserInfo(response)
+      // profileRequest chỉ trả null cho GET 404; GET 200 là hồ sơ đã tồn tại.
+      setProfileExists(response !== null)
       setFields(info?.domain && !domains.some((domain) => domain.id === info.domain!.id) ? [...domains, info.domain] : domains)
-      setExists(info !== null)
       setUsername(info?.username || user.username || '')
       setSalaryNegotiable(info?.salaryNegotiable ?? false)
       setSalaryRange([Math.round(info?.salaryMin ?? 5), Math.round(info?.salaryMax ?? 10)])
@@ -134,8 +136,22 @@ export function UpdateProfilePage() {
     savingRef.current = true
     setSaving(true)
     try {
-      await profileRequest('user-infos', token, { method: exists ? 'PUT' : 'POST', body: createUserInfoFormData(profile) })
-      setExists(true)
+      const response = await profileRequest('user-infos', token, { method: profileExists ? 'PUT' : 'POST', body: createUserInfoFormData(profile) })
+      setProfileExists(true)
+      // Ưu tiên URL trả về sau lưu; nếu response không có URL thì tải lại hồ sơ.
+      const savedImage = response && typeof response === 'object'
+        ? ('imageUrl' in response && typeof response.imageUrl === 'string' ? response.imageUrl : 'image' in response && typeof response.image === 'string' ? response.image : '')
+        : ''
+      if (savedImage) setImage(savedImage)
+      else {
+        try {
+          const saved = parseUserInfo(await profileRequest('user-infos', token))
+          if (saved?.image) setImage(saved.image)
+        } catch {
+          setSuccess('Đã lưu hồ sơ. Chưa tải được URL ảnh mới, vui lòng tải lại trang trước lần lưu tiếp theo.')
+          return
+        }
+      }
       setSuccess('Đã lưu thông tin hồ sơ.')
     } catch (error) { setError(error instanceof Error ? error.message : 'Không thể lưu hồ sơ.') }
     finally { savingRef.current = false; setSaving(false) }

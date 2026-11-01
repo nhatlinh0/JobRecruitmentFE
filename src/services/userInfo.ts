@@ -80,7 +80,7 @@ export async function profileRequest(path: string, token: string, options: Reque
     headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, ...(options.body && !(options.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}) },
     signal: options.signal ?? AbortSignal.timeout(15000),
   })
-  if (path === 'user-infos' && (!options.method || options.method === 'GET') && (response.status === 204 || response.status === 404)) return null
+  if (path === 'user-infos' && (!options.method || options.method === 'GET') && response.status === 404) return null
   const text = await response.text()
   let body: unknown = null
   if (text) { try { body = JSON.parse(text) } catch { if (response.ok && (!options.method || options.method === 'GET')) throw new Error('Server trả về dữ liệu không hợp lệ.'); body = text } }
@@ -88,7 +88,11 @@ export async function profileRequest(path: string, token: string, options: Reque
     const message = body && typeof body === 'object' && 'message' in body && typeof body.message === 'string' ? body.message : typeof body === 'string' && !body.trimStart().startsWith('<') ? body.slice(0, 300) : `Yêu cầu thất bại (HTTP ${response.status}).`
     throw new Error(message)
   }
-  return unwrap(body)
+  const result = unwrap(body)
+  if (path === 'user-infos' && (!options.method || options.method === 'GET') && result == null) {
+    throw new Error('Server trả về hồ sơ rỗng. Chỉ HTTP 404 được xem là chưa có hồ sơ.')
+  }
+  return result
 }
 
 export function parseUserInfo(body: unknown): UserInfoResponse | null {
@@ -108,7 +112,7 @@ export function parseUserInfo(body: unknown): UserInfoResponse | null {
   return {
     username: typeof info.username === 'string' ? info.username : '',
     city: typeof info.city === 'string' ? info.city : '',
-    image: typeof info.image === 'string' ? info.image : '',
+    image: typeof info.imageUrl === 'string' ? info.imageUrl : typeof info.image === 'string' ? info.image : '',
     workingType: typeof info.workingType === 'string' ? info.workingType : typeof info.workType === 'string' ? info.workType : '',
     domainId,
     domain: domain && typeof domain.name === 'string' && domainId > 0 ? { id: domainId, name: domain.name } : null,
