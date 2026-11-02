@@ -2,18 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { UserMenu } from './UserMenu'
-import { navItems } from '../../data/navigation'
+import { navItems, publicNavGroups as publicGroups } from '../../data/navigation'
 import { fetchPublicNavigation, type PublicNavItem } from '../../services/publicNavigation'
 import { Icon } from '../ui/Icon'
 import { Logo } from '../ui/Logo'
 import { NavDropdown } from './NavDropdown'
 import './Header.css'
 
-const publicGroups = [
-  { id: 'by-field', label: 'Việc làm theo chuyên môn', endpoint: 'domains' },
-  { id: 'by-skill', label: 'Việc làm theo kỹ năng', endpoint: 'skills' },
-  { id: 'by-company', label: 'Việc làm theo công ty', endpoint: 'companies' },
-]
 interface MenuData { items: PublicNavItem[]; loading: boolean; error: string }
 
 export function Header() {

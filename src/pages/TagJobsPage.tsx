@@ -1,23 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { JobList } from '../components/jobs/JobList'
 import { Pagination } from '../components/ui/Pagination'
-import { jobs } from '../data/jobs'
-import { navGroups } from '../data/navigation'
+import { fetchJobsByTag } from '../services/home'
+import type { Job } from '../types/job'
 import { useSavedJobs } from '../hooks/useSavedJobs'
-import { slugify } from '../utils/slugify'
 import './TagJobsPage.css'
 
-const skillOptions = navGroups.find((group) => group.id === 'by-skill')?.items.map((item) => item.label) ?? []
-const fieldOptions = navGroups.find((group) => group.id === 'by-field')?.items.map((item) => item.label) ?? []
 const PAGE_SIZE = 6
 
-function resolveLabel(slug: string, options: string[], jobValues: string[]): string {
-  return [...options, ...jobValues].find((value) => slugify(value) === slug) ?? slug
-}
 
 interface TagJobsPageProps {
-  kind: 'skill' | 'field'
+  kind: 'skill' | 'field' | 'company'
 }
 
 function TagJobsPage({ kind }: TagJobsPageProps) {
@@ -25,23 +19,26 @@ function TagJobsPage({ kind }: TagJobsPageProps) {
   const { savedIds, toggleSaved } = useSavedJobs()
   const listKey = `${kind}:${slug}`
   const [pagination, setPagination] = useState({ key: listKey, page: 0 })
+  const location = useLocation()
+  const [result, setResult] = useState<{ key: string; jobs: Job[]; error: string } | null>(null)
+  const [retry, setRetry] = useState(0)
 
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [slug])
+    const controller = new AbortController()
+    fetchJobsByTag(kind, slug, controller.signal).then((jobs) => {
+      if (!controller.signal.aborted) setResult({ key: listKey, jobs, error: '' })
+    }).catch((error: unknown) => {
+      if (!controller.signal.aborted) setResult({ key: listKey, jobs: [], error: error instanceof Error ? error.message : 'Không thể tải danh sách việc làm.' })
+    })
+    return () => controller.abort()
+  }, [slug, kind, listKey, retry])
 
-  const label =
-    kind === 'skill'
-      ? resolveLabel(slug, skillOptions, jobs.flatMap((job) => job.skills))
-      : resolveLabel(slug, fieldOptions, jobs.map((job) => job.field))
+  const label = typeof location.state?.label === 'string' ? location.state.label : slug.replaceAll('-', ' ')
+  const data = result?.key === listKey ? result : null
+  const matchedJobs = data?.jobs ?? []
 
-  const matchedJobs = jobs.filter((job) =>
-    kind === 'skill'
-      ? job.skills.some((skill) => slugify(skill) === slug)
-      : slugify(job.field) === slug,
-  )
-
-  const title = kind === 'skill' ? `Việc làm ${label}` : `Việc làm theo ${label}`
+  const title = kind === 'company' ? `Việc làm tại ${label}` : kind === 'skill' ? `Việc làm ${label}` : `Việc làm theo ${label}`
   const totalPages = Math.ceil(matchedJobs.length / PAGE_SIZE)
   const page = pagination.key === listKey ? Math.max(0, Math.min(pagination.page, totalPages - 1)) : 0
   const content = matchedJobs.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
@@ -49,12 +46,12 @@ function TagJobsPage({ kind }: TagJobsPageProps) {
   return (
     <section className="tag-jobs">
       <div className="tag-jobs__heading">
-        <span className="section-kicker">{kind === 'skill' ? 'KỸ NĂNG' : 'CHUYÊN MÔN'}</span>
+        <span className="section-kicker">{kind === 'company' ? 'CÔNG TY' : kind === 'skill' ? 'KỸ NĂNG' : 'CHUYÊN MÔN'}</span>
         <h1>{title}</h1>
-        <p>{matchedJobs.length} vị trí đang tuyển dụng.</p>
+        {data && !data.error && <p>{matchedJobs.length} vị trí đang tuyển dụng.</p>}
       </div>
 
-      {matchedJobs.length > 0 ? (
+      {!data ? <p role="status">Đang tải việc làm...</p> : data.error ? <div role="alert">{data.error} <button type="button" onClick={() => { setResult(null); setRetry((value) => value + 1) }}>Thử lại</button></div> : matchedJobs.length > 0 ? (
         <JobList jobs={content} onReset={() => {}} onToggleSave={toggleSaved} savedIds={savedIds} />
       ) : (
         <div className="tag-jobs__empty">
@@ -74,4 +71,8 @@ export function SkillJobsPage() {
 
 export function FieldJobsPage() {
   return <TagJobsPage kind="field" />
+}
+
+export function CompanyJobsPage() {
+  return <TagJobsPage kind="company" />
 }

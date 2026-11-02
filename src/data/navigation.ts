@@ -10,7 +10,13 @@ export interface NavGroup {
   items: NavItem[]
 }
 
-export const NAV_PREVIEW_LIMIT = 20
+export const NAV_PREVIEW_LIMIT = 28
+
+export const publicNavGroups = [
+  { id: 'by-field', label: 'Việc làm theo chuyên môn', endpoint: 'domains' },
+  { id: 'by-skill', label: 'Việc làm theo kỹ năng', endpoint: 'skills' },
+  { id: 'by-company', label: 'Việc làm theo công ty', endpoint: 'companies' },
+]
 
 export const companyIndustries = [
   'Game',

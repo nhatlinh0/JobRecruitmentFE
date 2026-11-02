@@ -1,8 +1,11 @@
-import { useState, type FormEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import * as Slider from '@radix-ui/react-slider'
-import { jobs } from '../data/jobs'
-import { navGroups } from '../data/navigation'
+import { fetchPublicNavigation } from '../services/publicNavigation'
+import { fetchProfileOptions, type ProfileOption } from '../services/userInfo'
+import { createJob, updateJob, fetchMyJob, type RecruitJob, type CreateJobPayload } from '../services/jobs'
+import { useAuth } from '../hooks/useAuth'
+import { Toast, type ToastMessage } from '../components/ui/Toast'
 import { slugify } from '../utils/slugify'
 import './JobPostViewPage.css'
 import './UpdateProfilePage.css'
@@ -22,14 +25,31 @@ const cities = [
 
 const workTypes = ['FULL_TIME', 'PART_TIME', 'REMOTE', 'HYBRID', 'FLEXIBLE'] as const
 
-const fields = navGroups.find((group) => group.id === 'by-field')?.items ?? []
-const skills = navGroups.find((group) => group.id === 'by-skill')?.items ?? []
 const MAX_SKILLS = 6
 
 export function JobPostCreatePage() {
   const { id } = useParams<{ id: string }>()
-  const editingPost = id ? jobs.find((job) => job.id === Number(id)) : undefined
-  const isEdit = Boolean(editingPost)
+  return <JobPostForm key={id ?? 'new'} />
+}
+
+function JobPostForm() {
+  const { token, user } = useAuth()
+  const [fields, setFields] = useState<ProfileOption[]>([])
+  const [skills, setSkills] = useState<ProfileOption[]>([])
+  const [skillsLoading, setSkillsLoading] = useState(false)
+  const [skillsError, setSkillsError] = useState('')
+  const [skillsRetry, setSkillsRetry] = useState(0)
+  const [ready, setReady] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [retry, setRetry] = useState(0)
+  const [saving, setSaving] = useState(false)
+  const submitting = useRef(false)
+  const [notification, setNotification] = useState<ToastMessage | null>(null)
+  const closeToast = useCallback(() => setNotification(null), [])
+  const { id } = useParams<{ id: string }>()
+  const [editingPost, setEditingPost] = useState<RecruitJob | null>(null)
+  const initialSkills = useRef<RecruitJob | null>(null)
+  const isEdit = Boolean(id)
 
   const [title, setTitle] = useState(editingPost?.title ?? '')
   const [address, setAddress] = useState(editingPost?.address ?? '')
@@ -38,9 +58,9 @@ export function JobPostCreatePage() {
   const [description, setDescription] = useState(editingPost?.description ?? '')
   const [requirements, setRequirements] = useState(editingPost?.requirements ?? '')
   const [benefits, setBenefits] = useState(editingPost?.benefits ?? '')
-  const [field, setField] = useState(editingPost?.field ?? '')
+  const [field, setField] = useState('')
   const [city, setCity] = useState(editingPost?.city ?? '')
-  const [selectedSkills, setSelectedSkills] = useState<string[]>(editingPost?.skills ?? [])
+  const [selectedSkills, setSelectedSkills] = useState<number[]>([])
   const [[experienceMin, experienceMax], setExperienceRange] = useState<[number, number]>(
     editingPost?.experience ? [editingPost.experience.min, editingPost.experience.max] : [1, 3],
   )
@@ -53,10 +73,60 @@ export function JobPostCreatePage() {
   const [success, setSuccess] = useState('')
   const slug = slugify(title)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (!token || user?.role !== 'RECRUIT') return
+    const controller = new AbortController()
+    Promise.all([
+      fetchPublicNavigation('domains', controller.signal),
+      id ? fetchMyJob(token, Number(id), controller.signal) : Promise.resolve(null),
+    ]).then(([options, job]) => {
+      if (controller.signal.aborted) return
+      const domains = options.map((item) => ({ id: Number(item.id), name: item.label }))
+      if (domains.some((item) => !Number.isInteger(item.id) || item.id <= 0)) throw new Error('Dữ liệu lĩnh vực thiếu ID hợp lệ.')
+      setFields(domains)
+      if (id && !job) throw new Error('Không tìm thấy bài đăng cần cập nhật.')
+      if (job) {
+        setEditingPost(job)
+        initialSkills.current = job
+        setTitle(job.title); setAddress(job.address); setDeadline(job.deadline.slice(0, 10))
+        setWorkType(job.workType.replaceAll(' ', '_')); setDescription(job.description)
+        setRequirements(job.requirements); setBenefits(job.benefits); setCity(job.city)
+        setExperienceRange(job.experience ? [job.experience.min, job.experience.max] : [1, 3])
+        setSalaryRange(job.salary ? [job.salary.min, job.salary.max] : [5, 10])
+        setSalaryNegotiable(job.salary === null); setFeatured(job.featured)
+        const domainId = job.domainId ?? domains.find((item) => item.name === job.field)?.id
+        setField(domainId ? String(domainId) : '')
+        if (domainId && !domains.some((item) => item.id === domainId)) setFields([...domains, { id: domainId, name: job.field || `Lĩnh vực #${domainId}` }])
+        setSkillsLoading(Boolean(domainId))
+      }
+      setReady(true)
+    }).catch((error: unknown) => { if (!controller.signal.aborted) setError(error instanceof Error ? error.message : 'Không thể tải danh mục.') })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false) })
+    return () => controller.abort()
+  }, [token, user?.role, id, retry])
+
+  useEffect(() => {
+    if (!token || !field || user?.role !== 'RECRUIT') return
+    const controller = new AbortController()
+    fetchProfileOptions(`domains/${field}`, token, controller.signal).then((options) => {
+      if (controller.signal.aborted) return
+      setSkills(options)
+      const initial = initialSkills.current
+      if (initial) {
+        setSelectedSkills(options.filter((item) => initial.skillIds.length ? initial.skillIds.includes(item.id) : initial.skills.includes(item.name)).map((item) => item.id))
+        initialSkills.current = null
+      }
+    }).catch((error: unknown) => {
+      if (!controller.signal.aborted) setSkillsError(error instanceof Error ? error.message : 'Không thể tải kỹ năng.')
+    }).finally(() => { if (!controller.signal.aborted) setSkillsLoading(false) })
+    return () => controller.abort()
+  }, [field, token, user?.role, skillsRetry])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
     setSuccess('')
+    if (!token || !ready || submitting.current || skillsLoading || skillsError) return
 
     if (!slug) {
       setError('Tên công việc phải có ít nhất một chữ cái hoặc chữ số.')
@@ -68,36 +138,47 @@ export function JobPostCreatePage() {
       return
     }
 
-    const post = {
+    if (experienceMin >= experienceMax || (!salaryNegotiable && salaryMin >= salaryMax)) {
+      setError('Giá trị tối thiểu phải nhỏ hơn giá trị tối đa.'); return
+    }
+
+    const post: CreateJobPayload = {
       title,
       slug,
       address,
-      deadline,
-      workType,
+      end_date: deadline,
+      working_type: workType,
       description,
       requirements,
       benefits,
-      field,
+      domain_id: field,
       city,
-      skills: selectedSkills,
-      experienceMin,
-      experienceMax,
-      salaryNegotiable,
-      salaryMin: salaryNegotiable ? null : salaryMin,
-      salaryMax: salaryNegotiable ? null : salaryMax,
-      featured,
+      skillIds: selectedSkills,
+      experience_min: String(experienceMin),
+      experience_max: String(experienceMax),
+      salary_negotiable: String(salaryNegotiable),
+      salary_min: salaryNegotiable ? null : String(salaryMin),
+      salary_max: salaryNegotiable ? null : String(salaryMax),
+      prioritize: String(featured),
     }
 
-    console.log(isEdit ? 'Cập nhật bài đăng:' : 'Bài đăng tuyển dụng:', post)
-    setSuccess(
-      isEdit
-        ? 'Thông tin đã được kiểm tra. Chức năng cập nhật chưa được kết nối API.'
-        : 'Thông tin đã được kiểm tra. Chức năng đăng bài chưa được kết nối API.',
-    )
+    submitting.current = true; setSaving(true)
+    try {
+      if (id) await updateJob(token, Number(id), post)
+      else await createJob(token, post)
+      setNotification({ type: 'success', message: id ? 'Đã cập nhật công việc thành công.' : 'Đã tạo công việc thành công.' })
+    } catch (error) {
+      setNotification({ type: 'error', message: error instanceof Error ? error.message : 'Không thể kết nối máy chủ.' })
+    } finally { submitting.current = false; setSaving(false) }
   }
+
+  if (!token) return <Navigate to="/login" replace />
+  if (!user?.role) return <p role="status">Đang tải thông tin người dùng...</p>
+  if (user.role !== 'RECRUIT') return <Navigate to="/" replace />
 
   return (
     <section className="profile-update">
+      <Toast notification={notification} onClose={closeToast} />
       {isEdit && <Link className="post-view__back" to="/recruit/posts">← Quay lại danh sách</Link>}
       <div className="profile-update__heading">
         <span className="section-kicker">NHÀ TUYỂN DỤNG</span>
@@ -106,6 +187,9 @@ export function JobPostCreatePage() {
       </div>
 
       <form className="profile-form" onSubmit={handleSubmit}>
+        {loading && <p role="status">Đang tải danh mục...</p>}
+        {!loading && !ready && <><p role="alert">{error}</p><button type="button" onClick={() => { setLoading(true); setError(''); setRetry((value) => value + 1) }}>Thử lại</button></>}
+        <fieldset disabled={saving || (isEdit && !ready)} style={{ border: 0, margin: 0, padding: 0, minWidth: 0, display: 'grid', gap: 24 }}>
         <div className="profile-form__section">
           <h2>Thông tin công việc</h2>
           <div className="profile-form__grid">
@@ -126,10 +210,10 @@ export function JobPostCreatePage() {
 
             <label className="profile-field">
               <span>Lĩnh vực <b>*</b></span>
-              <select onChange={(event) => setField(event.target.value)} required value={field}>
+              <select disabled={!ready} onChange={(event) => { setField(event.target.value); setSelectedSkills([]); setSkills([]); setSkillsError(''); setSkillsLoading(Boolean(event.target.value)) }} required value={field}>
                 <option value="">Chọn lĩnh vực</option>
                 {fields.map((item) => (
-                  <option key={item.label} value={item.label}>{item.label}</option>
+                  <option key={item.id} value={item.id}>{item.name}</option>
                 ))}
               </select>
             </label>
@@ -138,6 +222,7 @@ export function JobPostCreatePage() {
               <span>Thành phố <b>*</b></span>
               <select onChange={(event) => setCity(event.target.value)} required value={city}>
                 <option value="">Chọn thành phố</option>
+                {city && !cities.includes(city) && <option value={city}>{city}</option>}
                 {cities.map((cityName) => (
                   <option key={cityName} value={cityName}>{cityName}</option>
                 ))}
@@ -149,7 +234,7 @@ export function JobPostCreatePage() {
               <select onChange={(event) => setWorkType(event.target.value)} required value={workType}>
                 <option value="">Chọn hình thức</option>
                 {workTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
+                  <option key={type} value={type}>{type.replaceAll('_', ' ')}</option>
                 ))}
               </select>
             </label>
@@ -224,9 +309,9 @@ export function JobPostCreatePage() {
             <div className="profile-field profile-field--full">
               <span>Kỹ năng <b>*</b> (tối đa {MAX_SKILLS})</span>
               <select
-                disabled={selectedSkills.length >= MAX_SKILLS}
+                disabled={!field || skillsLoading || Boolean(skillsError) || selectedSkills.length >= MAX_SKILLS}
                 onChange={(event) => {
-                  const value = event.target.value
+                  const value = Number(event.target.value)
                   if (value && !selectedSkills.includes(value)) {
                     setSelectedSkills([...selectedSkills, value])
                   }
@@ -235,19 +320,19 @@ export function JobPostCreatePage() {
                 value=""
               >
                 <option value="">
-                  {selectedSkills.length >= MAX_SKILLS ? 'Đã chọn tối đa' : 'Chọn kỹ năng'}
+                  {!field ? 'Chọn lĩnh vực trước' : skillsLoading ? 'Đang tải kỹ năng...' : selectedSkills.length >= MAX_SKILLS ? 'Đã chọn tối đa' : 'Chọn kỹ năng'}
                 </option>
                 {skills
-                  .filter((item) => !selectedSkills.includes(item.label))
+                  .filter((item) => !selectedSkills.includes(item.id))
                   .map((item) => (
-                    <option key={item.label} value={item.label}>{item.label}</option>
+                    <option key={item.id} value={item.id}>{item.name}</option>
                   ))}
               </select>
               {selectedSkills.length > 0 && (
                 <div className="skill-chips">
                   {selectedSkills.map((item) => (
                     <span className="skill-chip" key={item}>
-                      {item}
+                      {skills.find((skill) => skill.id === item)?.name ?? item}
                       <button
                         aria-label={`Xóa kỹ năng ${item}`}
                         className="skill-chip__remove"
@@ -261,6 +346,7 @@ export function JobPostCreatePage() {
                 </div>
               )}
               <span className="profile-form__hint">Đã chọn {selectedSkills.length}/{MAX_SKILLS} kỹ năng.</span>
+              {skillsError && <><p role="alert">{skillsError}</p><button type="button" onClick={() => { setSkillsLoading(true); setSkillsError(''); setSkillsRetry((value) => value + 1) }}>Tải lại kỹ năng</button></>}
             </div>
 
             <div className="profile-field profile-field--full">
@@ -268,7 +354,7 @@ export function JobPostCreatePage() {
               <Slider.Root
                 aria-label="Khoảng kinh nghiệm"
                 className="salary-range experience-range"
-                max={10}
+                max={Math.max(10, experienceMax)}
                 min={0}
                 minStepsBetweenThumbs={1}
                 onValueChange={(values) => {
@@ -343,7 +429,7 @@ export function JobPostCreatePage() {
                 aria-label="Khoảng lương"
                 className={`salary-range${salaryNegotiable ? ' salary-range--disabled' : ''}`}
                 disabled={salaryNegotiable}
-                max={100}
+                max={Math.max(100, salaryMax)}
                 min={0}
                 minStepsBetweenThumbs={1}
                 preserveThumbOrder
@@ -396,10 +482,11 @@ export function JobPostCreatePage() {
         {success && <p className="profile-form__message profile-form__message--success" role="status">{success}</p>}
 
         <div className="profile-form__actions">
-          <button className="button button-primary profile-form__submit" type="submit">
-            {isEdit ? 'Lưu thay đổi' : 'Đăng bài tuyển dụng'}
+          <button className="button button-primary profile-form__submit" type="submit" disabled={!ready || skillsLoading || Boolean(skillsError)}>
+            {saving ? 'Đang lưu...' : isEdit ? 'Lưu thay đổi' : 'Đăng bài tuyển dụng'}
           </button>
         </div>
+        </fieldset>
       </form>
     </section>
   )

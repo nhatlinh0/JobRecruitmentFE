@@ -175,3 +175,16 @@
     margin-left: 0;
   }
 }
+.post-view__company {
+  background: #fff;
+  border: 1px solid #e2ebe5;
+  border-radius: 16px;
+  margin: 24px 0;
+  padding: 24px;
+}
+
+.post-view__company h2 { font-size: 18px; margin: 0 0 20px; }
+.post-view__company-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.post-view__company-heading h3 { margin: 0; font-size: 22px; overflow-wrap: anywhere; }
+.post-view__company-logo { width: 72px; height: 72px; object-fit: contain; border: 1px solid #e2ebe5; border-radius: 12px; background: #fff; }
+.post-view__company .post-view__meta { margin-bottom: 0; }

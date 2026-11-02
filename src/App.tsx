@@ -9,7 +9,8 @@ import { JobPostViewPage } from './pages/JobPostViewPage'
 import { JobApplicantsPage } from './pages/JobApplicantsPage'
 import { JobDetailPage } from './pages/JobDetailPage'
 import { CompanyDetailPage } from './pages/CompanyDetailPage'
-import { FieldJobsPage, SkillJobsPage } from './pages/TagJobsPage'
+import { FieldJobsPage, SkillJobsPage, CompanyJobsPage } from './pages/TagJobsPage'
+import { IndustryCompaniesPage } from './pages/IndustryCompaniesPage'
 import { NavGroupPage } from './pages/NavGroupPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { UpdateProfilePage } from './pages/UpdateProfilePage'
@@ -41,6 +42,8 @@ function App() {
         <Route path="/recruit/posts" element={<JobPostListPage />} />
         <Route path="/jobs/:slug" element={<JobDetailPage />} />
         <Route path="/companies/:slug" element={<CompanyDetailPage />} />
+        <Route path="/companies/:slug/jobs" element={<CompanyJobsPage />} />
+        <Route path="/industries/:slug" element={<IndustryCompaniesPage />} />
         <Route path="/skills/:slug" element={<SkillJobsPage />} />
         <Route path="/fields/:slug" element={<FieldJobsPage />} />
       </Routes>

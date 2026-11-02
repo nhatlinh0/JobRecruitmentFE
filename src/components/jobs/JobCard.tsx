@@ -13,6 +13,7 @@ interface JobCardProps {
 
 export function JobCard({ job, isSaved, onToggleSave }: JobCardProps) {
   const skills = job.skills.slice(0, MAX_SKILLS)
+  const detailUrl = `/jobs/${encodeURIComponent(job.slug || slugify(job.title))}`
 
   return (
     <article className={`job-card${job.featured ? ' job-card--featured' : ''}`}>
@@ -37,8 +38,8 @@ export function JobCard({ job, isSaved, onToggleSave }: JobCardProps) {
         </button>
       </div>
 
-      <h3>{job.title}</h3>
-      <Link className="job-field" to={`/fields/${slugify(job.field)}`}>{job.field}</Link>
+      <h3><Link className="job-card__title-link" to={detailUrl}>{job.title}</Link></h3>
+      <Link className="job-field" to={`/fields/${encodeURIComponent(job.domainSlug || slugify(job.field))}`} state={{ label: job.field }}>{job.field}</Link>
 
       <ul className="job-meta">
         <li><Icon name="location" />{job.city}</li>
@@ -49,14 +50,14 @@ export function JobCard({ job, isSaved, onToggleSave }: JobCardProps) {
       <ul className="job-skills" aria-label="Kỹ năng yêu cầu">
         {skills.map((skill) => (
           <li key={skill}>
-            <Link to={`/skills/${slugify(skill)}`}>{skill}</Link>
+            <Link to={`/skills/${encodeURIComponent(job.skillSlugs?.[skill] || slugify(skill))}`} state={{ label: skill }}>{skill}</Link>
           </li>
         ))}
       </ul>
 
       <div className="job-card-bottom">
         <div className="salary"><strong>{formatSalary(job.salary)}</strong></div>
-        <Link className="job-card-link" to={`/jobs/${slugify(job.title)}`}>
+        <Link className="job-card-link" to={detailUrl}>
           Xem chi tiết <Icon name="arrow" />
         </Link>
       </div>

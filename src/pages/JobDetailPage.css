@@ -298,3 +298,58 @@
     flex-direction: column;
   }
 }
+.job-detail.job-profile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-content: start;
+  align-items: start;
+  gap: 24px;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px 36px 80px;
+}
+.job-profile__breadcrumb { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: #869389; line-height: 1.6; }
+.job-profile__breadcrumb a { color: #647c6d; text-decoration: none; }
+.job-profile__breadcrumb span:last-child { color: #405749; }
+.job-profile .job-detail__header { grid-column: 1 / -1; background: linear-gradient(115deg, #fff 55%, #f0f7f1); padding: 32px; border-radius: 18px; border-color: #dce7dd; border-top: 4px solid #397c55; box-shadow: 0 5px 24px #203c2e05; flex-wrap: wrap; gap: 22px; }
+.job-profile__logo { width: 84px; height: 84px; object-fit: contain; background: #fff; border: 1px solid #e4ebe5; padding: 6px; border-radius: 16px; flex-shrink: 0; }
+.job-profile__eyebrow { color: #6b8774; font-size: 10px; font-weight: 750; letter-spacing: 1.6px; line-height: 1.6; }
+.job-profile .job-detail__heading { min-width: 180px; flex: 1; }
+.job-profile .job-detail__heading h1 { font-size: clamp(25px, 3vw, 34px); line-height: 1.3; margin: 8px 0 10px; letter-spacing: -.9px; overflow-wrap: anywhere; }
+.job-profile .job-detail__company-name { color: #52715e; font-size: 13px; text-decoration: none; }
+.job-profile .job-detail__company-name:hover { text-decoration: underline; }
+.job-profile .job-detail__actions { gap: 10px; }
+.job-profile .job-detail__apply { min-height: 46px; padding: 12px 30px; border-radius: 10px; }
+.job-profile .job-detail__save { width: 46px; height: 46px; border-radius: 10px; background: #fff; border: 1px solid #cfdfd2; color: #397451; }
+.job-profile .job-detail__meta { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-radius: 14px; padding: 8px 16px; border: 1px solid #e2e9e2; background: #fff; }
+.job-profile .job-detail__meta-item { font-size: 13px; padding: 16px; line-height: 1.6; min-width: 0; overflow-wrap: anywhere; align-items: flex-start; }
+.job-profile .job-detail__meta-item svg { flex-shrink: 0; margin-top: 2px; color: #699477; }
+.job-profile .job-detail__skills, .job-profile .job-detail__field { grid-column: 1; margin: 0; background: #fff; border: 1px solid #e4ebe4; border-radius: 14px; padding: 22px 26px; }
+.job-profile .job-detail__skills { grid-row: 4; }
+.job-profile .job-detail__field { grid-row: 5; }
+.job-profile .job-detail__skills h2, .job-profile .job-detail__field h2 { font-size: 14px; margin: 0 0 14px; letter-spacing: -.2px; }
+.job-profile .job-detail__skills li a { background: #f2f6f2; border: 1px solid #e0e9e0; color: #496c55; border-radius: 6px; }
+.job-profile .job-detail__content { grid-column: 1; grid-row: 6; background: #fff; border: 1px solid #e2e9e2; border-radius: 16px; padding: 30px; }
+.job-profile .job-detail__section { padding-bottom: 28px; margin-bottom: 28px; border-bottom: 1px solid #edf1ec; }
+.job-profile .job-detail__section:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+.job-profile .job-detail__section h2 { font-size: 20px; letter-spacing: -.5px; margin-bottom: 18px; }
+.job-profile .job-detail__text { color: #53665a; font-size: 14px; line-height: 1.95; overflow-wrap: anywhere; white-space: pre-wrap; }
+.job-profile .job-detail__company { grid-column: 2; grid-row: 4 / 7; border: 1px solid #e0e8e0; border-top: 3px solid #4b8960; background: #fff; border-radius: 14px; padding: 24px; min-width: 0; }
+.job-profile .job-detail__company > h2 { font-size: 15px; margin: 0 0 22px; }
+.job-profile .job-detail__company-card { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 0; background: transparent; border: 0; border-radius: 0; text-decoration: none; color: var(--ink); }
+.job-profile__logo--small { width: 64px; height: 64px; border-radius: 12px; }
+.job-profile .job-detail__company-info { width: 100%; min-width: 0; }
+.job-profile .job-detail__company-info h3 { font-size: 20px; margin: 0 0 18px; overflow-wrap: anywhere; }
+.job-profile .job-detail__company-info ul { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.job-profile .job-detail__company-info li { display: grid; gap: 6px; padding: 13px 0; border-bottom: 1px solid #edf1ed; font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.job-profile .job-detail__company-info strong { font-size: 11px; font-weight: 500; color: #829086; }
+.job-profile__company-description { font-size: 13px; color: #748379; white-space: pre-wrap; line-height: 1.8; overflow-wrap: anywhere; margin: 20px 0; }
+.job-profile__company-link { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 20px; padding: 13px 0 0; color: var(--green-dark); font-size: 12px; font-weight: 700; text-decoration: none; }
+.job-profile__company-link svg { width: 17px; height: 17px; }
+.job-profile .job-detail__related { grid-column: 1 / -1; margin-top: 16px; padding-top: 32px; border-top: 1px solid #dfe7df; }
+.job-profile__related-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.job-profile__related-heading h2 { margin: 8px 0 0; font-size: 26px; letter-spacing: -.7px; }
+.job-profile__related-heading > span { font-size: 12px; color: #597561; background: #eaf3eb; padding: 8px 12px; border-radius: 8px; }
+@media (max-width: 900px) { .job-detail.job-profile { grid-template-columns: minmax(0, 1fr) 280px; gap: 18px; padding: 24px 22px 60px; } .job-profile .job-detail__header { padding: 24px; } .job-profile .job-detail__content { padding: 24px; } .job-profile .job-detail__meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .job-detail.job-profile { display: flex; padding: 20px 18px 48px; gap: 20px; } .job-profile .job-detail__header, .job-profile .job-detail__company, .job-profile .job-detail__content, .job-profile .job-detail__skills, .job-profile .job-detail__field, .job-profile .job-detail__meta, .job-profile .job-detail__related { width: 100%; } .job-profile .job-detail__header { gap: 16px; padding: 20px; } .job-profile__logo { width: 64px; height: 64px; } .job-profile .job-detail__actions { width: 100%; } .job-profile .job-detail__apply { flex: 1; } .job-profile .job-detail__meta { padding: 8px; } .job-profile .job-detail__meta-item { padding: 12px 8px; font-size: 12px; } .job-profile .job-detail__content { padding: 22px; } .job-profile__related-heading h2 { font-size: 23px; } }

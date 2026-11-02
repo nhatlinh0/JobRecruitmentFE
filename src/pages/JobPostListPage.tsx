@@ -1,53 +1,87 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { jobs } from '../data/jobs'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link, Navigate } from 'react-router-dom'
+import { deleteJob, fetchMyJobs } from '../services/jobs'
+import { Toast, type ToastMessage } from '../components/ui/Toast'
+import { useAuth } from '../hooks/useAuth'
 import { formatDate } from '../utils/format'
 import { Icon } from '../components/ui/Icon'
 import './JobPostListPage.css'
 
 const PAGE_SIZE = 5
 
-type PostStatus = 'Đang tuyển' | 'Sắp hết hạn' | 'Hết hạn'
-
-function statusOf(deadline: string): PostStatus {
-  const daysLeft = Math.ceil((new Date(deadline).getTime() - Date.now()) / 86_400_000)
-  if (daysLeft < 0) return 'Hết hạn'
-  if (daysLeft <= 7) return 'Sắp hết hạn'
-  return 'Đang tuyển'
-}
-
-const statusClass: Record<PostStatus, string> = {
-  'Đang tuyển': 'is-open',
-  'Sắp hết hạn': 'is-expiring',
-  'Hết hạn': 'is-closed',
+const statusInfo: Record<string, { label: string; className: string }> = {
+  PENDING: { label: 'Chờ duyệt', className: 'is-expiring' },
+  ACCEPTED: { label: 'Được chấp nhận', className: 'is-open' },
+  REJECT: { label: 'Từ chối', className: 'is-closed' },
+  SUSPEND: { label: 'Tạm ngưng', className: 'is-suspended' },
 }
 
 export function JobPostListPage() {
+  const { token, user } = useAuth()
   const [page, setPage] = useState(0)
-  const [removedIds, setRemovedIds] = useState<number[]>([])
+  const [result, setResult] = useState<Awaited<ReturnType<typeof fetchMyJobs>> | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [retry, setRetry] = useState(0)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const deleting = useRef(false)
+  const [notification, setNotification] = useState<ToastMessage | null>(null)
+  const closeToast = useCallback(() => setNotification(null), [])
+  const totalElements = result?.totalElements ?? 0
+  const totalPages = result?.totalPages ?? 0
+  const currentPage = result?.page ?? page
+  const isLast = result?.isLast ?? true
+  const pagePosts = result?.content ?? []
+  useEffect(() => {
+    if (!token || user?.role !== 'RECRUIT') return
+    const controller = new AbortController()
+    fetchMyJobs(token, page, PAGE_SIZE, controller.signal).then((data) => {
+      if (!controller.signal.aborted) {
+        if (page > 0 && data.totalPages <= page) {
+          setPage(Math.max(0, data.totalPages - 1))
+          return
+        }
+        setResult(data)
+      }
+    }).catch((error: unknown) => { if (!controller.signal.aborted) setError(error instanceof Error ? error.message : 'Không thể tải bài đăng.') })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false) })
+    return () => controller.abort()
+  }, [token, user?.role, page, retry])
+  function changePage(next: number) { setLoading(true); setError(''); setPage(next) }
 
-  const posts = useMemo(() => jobs.filter((job) => !removedIds.includes(job.id)), [removedIds])
-
-  // Giả định phân trang phía server; sau này thay bằng response thật
-  const totalElements = posts.length
-  const totalPages = Math.max(1, Math.ceil(totalElements / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages - 1)
-  const isLast = currentPage >= totalPages - 1
-  const pagePosts = posts.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE)
-
-  function handleDelete(id: number, title: string) {
-    if (window.confirm(`Xóa bài đăng "${title}"?`)) {
-      setRemovedIds((current) => [...current, id])
+  async function handleDelete(id: number, title: string) {
+    if (!token || deleting.current || !window.confirm(`Xóa bài đăng "${title}"?`)) return
+    deleting.current = true
+    setDeletingId(id)
+    setNotification(null)
+    try {
+      await deleteJob(token, id)
+      setNotification({ type: 'success', message: 'Đã xóa bài đăng.' })
+      setLoading(true)
+      setError('')
+      setRetry((value) => value + 1)
+    } catch (error) {
+      setNotification({ type: 'error', message: error instanceof Error ? error.message : 'Không thể kết nối máy chủ.' })
+    } finally {
+      deleting.current = false
+      setDeletingId(null)
     }
   }
 
+  if (!token) return <Navigate to="/login" replace />
+  if (!user?.role) return <p role="status">Đang tải thông tin người dùng...</p>
+  if (user.role !== 'RECRUIT') return <Navigate to="/" replace />
+
   return (
     <section className="post-list">
+      <Toast notification={notification} onClose={closeToast} />
       <div className="post-list__heading">
         <span className="section-kicker">NHÀ TUYỂN DỤNG</span>
         <h1>Danh sách bài đăng</h1>
         <p>Quản lý toàn bộ tin tuyển dụng của công ty bạn.</p>
       </div>
+      {loading && <p role="status">Đang tải bài đăng...</p>}
+      {error && <div role="alert">{error} <button type="button" onClick={() => { setLoading(true); setError(''); setRetry((value) => value + 1) }}>Thử lại</button></div>}
 
       <div className="post-list__card">
         <table className="post-table">
@@ -62,16 +96,16 @@ export function JobPostListPage() {
             </tr>
           </thead>
           <tbody>
-            {pagePosts.map((post, index) => {
-              const status = statusOf(post.deadline)
+            {!loading && !error && pagePosts.map((post, index) => {
+              const status = statusInfo[post.status] ?? { label: post.status || 'Chưa có trạng thái', className: 'is-suspended' }
               return (
                 <tr key={post.id}>
-                  <td>{currentPage * PAGE_SIZE + index + 1}</td>
+                  <td>{currentPage * (result?.size ?? PAGE_SIZE) + index + 1}</td>
                   <td className="post-table__id">#{post.id}</td>
                   <td className="post-table__title">{post.title}</td>
-                  <td>{formatDate(post.deadline)}</td>
+                  <td>{post.deadline && !Number.isNaN(Date.parse(post.deadline)) ? formatDate(post.deadline) : 'Chưa cập nhật'}</td>
                   <td>
-                    <span className={`post-status ${statusClass[status]}`}>{status}</span>
+                    <span className={`post-status ${status.className}`}>{status.label}</span>
                   </td>
                   <td>
                     <div className="post-actions">
@@ -94,6 +128,8 @@ export function JobPostListPage() {
                       <button
                         aria-label={`Xóa ${post.title}`}
                         className="post-actions__icon post-actions__icon--danger"
+                        disabled={deletingId !== null}
+                        aria-busy={deletingId === post.id}
                         onClick={() => handleDelete(post.id, post.title)}
                         title="Xóa"
                         type="button"
@@ -108,7 +144,7 @@ export function JobPostListPage() {
                 </tr>
               )
             })}
-            {pagePosts.length === 0 && (
+            {!loading && !error && pagePosts.length === 0 && (
               <tr>
                 <td className="post-table__empty" colSpan={6}>Chưa có bài đăng nào.</td>
               </tr>
@@ -118,12 +154,12 @@ export function JobPostListPage() {
 
         <div className="post-pagination">
           <span className="post-pagination__info">
-            Trang {currentPage + 1}/{totalPages} · Tổng {totalElements} bài đăng
+            Trang {totalPages ? currentPage + 1 : 0}/{totalPages} · Tổng {totalElements} bài đăng
           </span>
           <div className="post-pagination__buttons">
             <button
-              disabled={currentPage === 0}
-              onClick={() => setPage(currentPage - 1)}
+              disabled={loading || currentPage === 0}
+              onClick={() => changePage(currentPage - 1)}
               type="button"
             >
               ← Trước
@@ -133,15 +169,16 @@ export function JobPostListPage() {
                 aria-current={i === currentPage ? 'page' : undefined}
                 className={i === currentPage ? 'is-active' : ''}
                 key={i}
-                onClick={() => setPage(i)}
+                disabled={loading}
+                onClick={() => changePage(i)}
                 type="button"
               >
                 {i + 1}
               </button>
             ))}
             <button
-              disabled={isLast}
-              onClick={() => setPage(currentPage + 1)}
+              disabled={loading || isLast}
+              onClick={() => changePage(currentPage + 1)}
               type="button"
             >
               Sau →

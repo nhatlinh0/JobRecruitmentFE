@@ -1,19 +1,41 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CtaBanner } from '../components/home/CtaBanner'
 import { FeaturedJobs } from '../components/home/FeaturedJobs'
 import { HeroSection } from '../components/home/HeroSection'
-import { TrustedCompanies } from '../components/home/TrustedCompanies'
 import { CompanyDirectory } from '../components/home/CompanyDirectory'
-import { jobs } from '../data/jobs'
+
 import { useAuth } from '../hooks/useAuth'
 import { useJobSearch } from '../hooks/useJobSearch'
 import { useSavedJobs } from '../hooks/useSavedJobs'
 import { RecruitHome } from './RecruitHome'
+import { fetchHomeCompanies, fetchHomeJobs, type HomeCompany } from '../services/home'
+import type { Job } from '../types/job'
+import './HomePage.css'
+
+const EMPTY_JOBS: Job[] = []
 
 export function HomePage() {
   const { user } = useAuth()
-  const search = useJobSearch(jobs)
+  const [remoteJobs, setRemoteJobs] = useState<Job[]>(EMPTY_JOBS)
+  const [companies, setCompanies] = useState<HomeCompany[]>([])
+  const [loadState, setLoadState] = useState({ companies: false, jobs: false, companyError: '', jobError: '' })
+  const [retry, setRetry] = useState(0)
+
+  const homeJobs = remoteJobs
+  const search = useJobSearch(homeJobs)
   const { savedIds, toggleSaved } = useSavedJobs()
+
+  useEffect(() => {
+    if (user?.role === 'RECRUIT') return
+    const controller = new AbortController()
+    fetchHomeCompanies(controller.signal).then((items) => {
+      if (!controller.signal.aborted) { setCompanies(items); setLoadState((state) => ({ ...state, companies: true, companyError: '' })) }
+    }).catch((error: unknown) => { if (!controller.signal.aborted) setLoadState((state) => ({ ...state, companies: true, companyError: error instanceof Error ? error.message : 'Không thể tải công ty.' })) })
+    fetchHomeJobs(controller.signal).then((items) => {
+      if (!controller.signal.aborted) { setRemoteJobs(items); setLoadState((state) => ({ ...state, jobs: true, jobError: '' })) }
+    }).catch((error: unknown) => { if (!controller.signal.aborted) setLoadState((state) => ({ ...state, jobs: true, jobError: error instanceof Error ? error.message : 'Không thể tải việc làm.' })) })
+    return () => controller.abort()
+  }, [user?.role, retry])
 
   useEffect(() => {
     if (window.location.search) scrollToJobs()
@@ -26,7 +48,7 @@ export function HomePage() {
   if (user?.role === 'RECRUIT') return <RecruitHome />
 
   return (
-    <>
+    <div className="home-page">
       <HeroSection
         city={search.city}
         keyword={search.keyword}
@@ -34,10 +56,10 @@ export function HomePage() {
         onKeywordChange={search.setKeyword}
         onSearch={scrollToJobs}
       />
-      <TrustedCompanies />
-      <CompanyDirectory />
+      {!loadState.companies ? <div className="home-page__status" role="status"><span className="section-kicker">NHÀ TUYỂN DỤNG</span><p>Đang tải công ty...</p></div> : loadState.companyError ? <div className="home-page__status" role="alert">{loadState.companyError} <button className="button button-outline" type="button" onClick={() => setRetry((value) => value + 1)}>Thử lại</button></div> : <CompanyDirectory items={companies} />}
+      {!loadState.jobs ? <div className="home-page__status" role="status"><span className="section-kicker">CƠ HỘI NGHỀ NGHIỆP</span><p>Đang tải việc làm...</p></div> : loadState.jobError ? <div className="home-page__status" role="alert">{loadState.jobError} <button className="button button-outline" type="button" onClick={() => setRetry((value) => value + 1)}>Thử lại</button></div> :
       <FeaturedJobs
-        allJobs={jobs}
+        allJobs={homeJobs}
         field={search.field}
         jobs={search.filteredJobs}
         onFieldChange={search.setField}
@@ -45,7 +67,8 @@ export function HomePage() {
         onToggleSave={toggleSaved}
         savedIds={savedIds}
       />
+      }
       <CtaBanner />
-    </>
+    </div>
   )
 }

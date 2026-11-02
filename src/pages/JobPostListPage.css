@@ -206,3 +206,7 @@
     min-width: 720px;
   }
 }
+.post-status.is-suspended {
+  background: #edf0f2;
+  color: #58616b;
+}

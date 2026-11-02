@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { NAV_PREVIEW_LIMIT, type NavGroup } from '../../data/navigation'
 import { Icon } from '../ui/Icon'
 import './NavDropdown.css'
-import type { PublicNavItem } from '../../services/publicNavigation'
+import { publicItemHref, type PublicNavItem } from '../../services/publicNavigation'
 
 interface NavDropdownProps {
   group: NavGroup
@@ -37,7 +37,8 @@ export function NavDropdown({ group, isOpen, onOpen, onClose, onToggle, onNaviga
       </button>
       <div className="mega-panel" id={panelId} hidden={!isOpen}>
         {publicItems !== undefined ? <>
-          {loading ? <p className="mega-message" role="status">Đang tải...</p> : error ? <p className="mega-message" role="status">{error}</p> : publicItems.length === 0 ? <p className="mega-message">Chưa có dữ liệu.</p> : <ul className="mega-grid mega-grid--public">{publicItems.map((item) => <li key={item.id}><span className="mega-link mega-link--display">{item.label}</span></li>)}</ul>}
+          {loading ? <p className="mega-message" role="status">Đang tải...</p> : error ? <p className="mega-message" role="status">{error}</p> : publicItems.length === 0 ? <p className="mega-message">Chưa có dữ liệu.</p> : <ul className="mega-grid mega-grid--public">{publicItems.slice(0, NAV_PREVIEW_LIMIT).map((item) => { const href = publicItemHref(group.id, item); return <li key={item.id}>{href ? <Link className="mega-link" to={href} state={{ label: item.label }} onClick={onNavigate}>{item.label}</Link> : <span className="mega-link mega-link--display">{item.label}</span>}</li> })}</ul>}
+          {!loading && !error && publicItems.length > NAV_PREVIEW_LIMIT && <div className="mega-footer"><Link className="mega-view-all" to={`/categories/${group.id}`} onClick={onNavigate}>Xem tất cả ({publicItems.length})</Link></div>}
         </> : <>
         <ul className="mega-grid">
           {group.items.slice(0, NAV_PREVIEW_LIMIT).map((item) => (
