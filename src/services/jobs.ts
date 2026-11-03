@@ -19,7 +19,23 @@ export interface CreateJobPayload {
 }
 
 export async function createJob(token: string, payload: CreateJobPayload): Promise<void> {
+  await assertCompanyCanPost(token)
   return saveJob(token, payload)
+}
+
+export async function assertCompanyCanPost(token: string, signal?: AbortSignal): Promise<void> {
+  const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000)
+  const response = await fetch('/api/api/v1/companies/my-company', {
+    method: 'GET', headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+    cache: 'no-store', signal: requestSignal,
+  })
+  if (response.status === 404) throw new Error('Bạn chưa có công ty. Vui lòng cập nhật thông tin công ty và chờ được duyệt trước khi đăng bài.')
+  if (response.status !== 200) throw new Error(`Không thể xác nhận quyền đăng bài (HTTP ${response.status}).`)
+  const raw: unknown = await response.json()
+  const company = raw && typeof raw === 'object' && 'data' in raw ? raw.data : raw
+  if (!company || typeof company !== 'object' || !('status' in company) || company.status !== 'ACCEPTED') {
+    throw new Error('Công ty chưa được duyệt hoặc đang bị tạm ngưng. Chỉ công ty có trạng thái ACCEPTED mới được đăng bài.')
+  }
 }
 
 export async function updateJob(token: string, id: number, payload: CreateJobPayload): Promise<void> {

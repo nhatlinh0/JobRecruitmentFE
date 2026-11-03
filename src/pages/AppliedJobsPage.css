@@ -11,3 +11,9 @@
 .application-cv__header button { border: 0; border-radius: 50%; background: #edf3ed; cursor: pointer; width: 36px; height: 36px; font-size: 24px; flex-shrink: 0; }
 .application-cv__body { padding: 20px; text-align: center; }
 .application-cv__body img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.application-list__review { display: flex; gap: 8px; }
+.application-list__review .button { padding: 8px 12px; white-space: nowrap; font-size: 12px; }
+.application-list__review .button:disabled { opacity: .45; cursor: not-allowed; }
+.application-list__review .application-list__reject { color: #b54036; border-color: #e9c7c2; background: #fff8f7; }
+.application-list__permission { color: var(--muted); font-size: 13px; line-height: 1.7; }
+.application-list__permission:empty { display: none; }

@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import * as Slider from '@radix-ui/react-slider'
 import { fetchPublicNavigation } from '../services/publicNavigation'
 import { fetchProfileOptions, type ProfileOption } from '../services/userInfo'
-import { createJob, updateJob, fetchMyJob, type RecruitJob, type CreateJobPayload } from '../services/jobs'
+import { assertCompanyCanPost, createJob, updateJob, fetchMyJob, type RecruitJob, type CreateJobPayload } from '../services/jobs'
 import { useAuth } from '../hooks/useAuth'
 import { Toast, type ToastMessage } from '../components/ui/Toast'
 import { slugify } from '../utils/slugify'
@@ -79,6 +79,7 @@ function JobPostForm() {
     Promise.all([
       fetchPublicNavigation('domains', controller.signal),
       id ? fetchMyJob(token, Number(id), controller.signal) : Promise.resolve(null),
+      id ? Promise.resolve() : assertCompanyCanPost(token, controller.signal),
     ]).then(([options, job]) => {
       if (controller.signal.aborted) return
       const domains = options.map((item) => ({ id: Number(item.id), name: item.label }))
@@ -188,7 +189,7 @@ function JobPostForm() {
 
       <form className="profile-form" onSubmit={handleSubmit}>
         {loading && <p role="status">Đang tải danh mục...</p>}
-        {!loading && !ready && <><p role="alert">{error}</p><button type="button" onClick={() => { setLoading(true); setError(''); setRetry((value) => value + 1) }}>Thử lại</button></>}
+        {!loading && !ready && <div className="profile-form__message profile-form__message--error" role="alert"><p>{error}</p>{!isEdit && <Link to="/my-company">Xem thông tin công ty</Link>} <button type="button" onClick={() => { setLoading(true); setError(''); setRetry((value) => value + 1) }}>Kiểm tra lại</button></div>}
         <fieldset disabled={saving || (isEdit && !ready)} style={{ border: 0, margin: 0, padding: 0, minWidth: 0, display: 'grid', gap: 24 }}>
         <div className="profile-form__section">
           <h2>Thông tin công việc</h2>

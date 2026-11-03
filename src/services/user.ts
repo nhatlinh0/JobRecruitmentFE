@@ -1,4 +1,5 @@
 export interface UserProfile {
+  status?: string
   username: string
   email?: string
   avatar?: string

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { JobList } from '../components/jobs/JobList'
 import { useSavedJobs } from '../hooks/useSavedJobs'
@@ -12,13 +12,16 @@ import type { Job } from '../types/job'
 import { Pagination } from '../components/ui/Pagination'
 import { ApplyModal } from '../components/ApplyModal'
 import { useAuth } from '../hooks/useAuth'
+import { assertApplicationAllowed } from '../services/applications'
 
 const RELATED_PAGE_SIZE = 6
 
 export function JobDetailPage() {
-  const { token } = useAuth()
+  const { token, profile } = useAuth()
   const navigate = useNavigate()
-  const [applyOpen, setApplyOpen] = useState(false)
+  const [applyJobId, setApplyJobId] = useState<number | null>(null)
+  const [checkingJobId, setCheckingJobId] = useState<number | null>(null)
+  const applicationCheck = useRef<AbortController | null>(null)
   const { slug } = useParams<{ slug: string }>()
   const [remote, setRemote] = useState<{ slug: string; job: Job | null; jobs: Job[]; error: string; relatedError: string } | null>(null)
   const [retry, setRetry] = useState(0)
@@ -26,6 +29,30 @@ export function JobDetailPage() {
   const sourceJobs = remote?.jobs ?? []
   const job = remote?.job
   const { savedIds, toggleSaved } = useSavedJobs()
+
+  useEffect(() => {
+    return () => { applicationCheck.current?.abort(); applicationCheck.current = null }
+  }, [slug, token])
+
+  async function openApplication() {
+    if (!token) { navigate('/login'); return }
+    if (!job || applicationCheck.current) return
+    if (profile?.status === 'INACTIVE') {
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { type: 'error', message: 'Tài khoản đang tạm ngưng, bạn không được phép ứng tuyển.' } }))
+      return
+    }
+    const controller = new AbortController()
+    applicationCheck.current = controller
+    setCheckingJobId(job.id)
+    try {
+      await assertApplicationAllowed(token, job.id, controller.signal, profile?.status)
+      if (!controller.signal.aborted) setApplyJobId(job.id)
+    } catch (error) {
+      if (!controller.signal.aborted) window.dispatchEvent(new CustomEvent('app-toast', { detail: { type: 'error', message: error instanceof Error ? error.message : 'Không thể kiểm tra quyền ứng tuyển.' } }))
+    } finally {
+      if (applicationCheck.current === controller) { applicationCheck.current = null; setCheckingJobId(null) }
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -69,7 +96,7 @@ export function JobDetailPage() {
 
   return (
     <section className="job-detail job-profile">
-      {applyOpen && <ApplyModal key={job.id} jobId={job.id} jobTitle={job.title} onClose={() => setApplyOpen(false)} />}
+      {token && applyJobId === job.id && <ApplyModal key={job.id} jobId={job.id} jobTitle={job.title} onClose={() => setApplyJobId(null)} />}
       <nav className="job-profile__breadcrumb" aria-label="Đường dẫn"><Link to="/">Trang chủ</Link><span>/</span><Link to="/#jobs">Việc làm</Link><span>/</span><span>{job.title}</span></nav>
       <div className="job-detail__header">
         {job.company?.logoUrl ? <img className="job-profile__logo" src={job.company.logoUrl} alt={`Logo ${job.companyName}`} /> : <div className="job-detail__company-mark" data-color={job.companyColor}>
@@ -83,10 +110,12 @@ export function JobDetailPage() {
         <div className="job-detail__actions">
           <button
             className="button button-primary job-detail__apply"
-            onClick={() => { if (!token) navigate('/login'); else setApplyOpen(true) }}
+            onClick={openApplication}
+            disabled={checkingJobId === job.id}
+            aria-busy={checkingJobId === job.id}
             type="button"
           >
-            Ứng tuyển
+            {checkingJobId === job.id ? 'Đang kiểm tra...' : 'Ứng tuyển'}
           </button>
           <button aria-label="Lưu công việc" title="Lưu công việc" aria-pressed={savedIds.includes(job.id)} onClick={() => toggleSaved(job.id)} className="job-detail__save" type="button">
             <Icon name="bookmark" />

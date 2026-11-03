@@ -15,7 +15,7 @@ interface ApplyModalProps {
 }
 
 export function ApplyModal({ jobId, jobTitle, onClose }: ApplyModalProps) {
-  const { token } = useAuth()
+  const { token, profile } = useAuth()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const submitting = useRef(false)
   const [saving, setSaving] = useState(false)
@@ -77,7 +77,7 @@ export function ApplyModal({ jobId, jobTitle, onClose }: ApplyModalProps) {
     submitting.current = true
     setSaving(true)
     try {
-      await submitApplication(token, jobId, introduction, useProfileCv ? profileCv : cv!)
+      await submitApplication(token, jobId, introduction, useProfileCv ? profileCv : cv!, profile?.status)
       setSuccess('Đã gửi đơn ứng tuyển thành công.')
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { type: 'success', message: 'Đã gửi đơn ứng tuyển thành công.' } }))
     } catch (error) {
