@@ -18,7 +18,8 @@ import { StaffCreatePage } from './pages/StaffCreatePage'
 import { StaffListPage } from './pages/StaffListPage'
 import { CandidateSearchPage } from './pages/CandidateSearchPage'
 import { ChangePasswordPage } from './pages/ChangePasswordPage'
-import { SavedJobsPage } from './pages/SavedJobsPage'
+import { UserJobsPage } from './pages/UserJobsPage'
+import { AppliedJobsPage } from './pages/AppliedJobsPage'
 
 function App() {
   return (
@@ -28,7 +29,8 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
-        <Route path="/saved-jobs" element={<SavedJobsPage />} />
+        <Route path="/saved-jobs" element={<UserJobsPage kind="saved" />} />
+        <Route path="/applied-jobs" element={<AppliedJobsPage />} />
         <Route path="/categories/:groupId" element={<NavGroupPage />} />
         <Route path="/update-profile" element={<UpdateProfilePage />} />
         <Route path="/my-company" element={<MyCompanyPage />} />

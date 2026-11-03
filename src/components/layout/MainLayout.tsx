@@ -4,6 +4,7 @@ import { Footer } from './Footer'
 import { Header } from './Header'
 import { RecruitSidebar } from './RecruitSidebar'
 import './MainLayout.css'
+import { GlobalToast } from '../ui/GlobalToast'
 
 export function MainLayout({ children }: { children: ReactNode }) {
   const { user } = useAuth()
@@ -11,6 +12,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="site-shell">
+      <GlobalToast />
       <Header />
       <div className={`site-body${isRecruit ? ' site-body--with-sidebar' : ''}`}>
         {isRecruit && <RecruitSidebar />}

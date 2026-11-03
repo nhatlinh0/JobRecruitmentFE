@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { JobList } from '../components/jobs/JobList'
 import { useSavedJobs } from '../hooks/useSavedJobs'
 import { formatDate, formatSalary } from '../utils/format'
@@ -10,10 +10,15 @@ import './JobDetailRefined.css'
 import { fetchHomeJobs, fetchJobBySlug } from '../services/home'
 import type { Job } from '../types/job'
 import { Pagination } from '../components/ui/Pagination'
+import { ApplyModal } from '../components/ApplyModal'
+import { useAuth } from '../hooks/useAuth'
 
 const RELATED_PAGE_SIZE = 6
 
 export function JobDetailPage() {
+  const { token } = useAuth()
+  const navigate = useNavigate()
+  const [applyOpen, setApplyOpen] = useState(false)
   const { slug } = useParams<{ slug: string }>()
   const [remote, setRemote] = useState<{ slug: string; job: Job | null; jobs: Job[]; error: string; relatedError: string } | null>(null)
   const [retry, setRetry] = useState(0)
@@ -64,6 +69,7 @@ export function JobDetailPage() {
 
   return (
     <section className="job-detail job-profile">
+      {applyOpen && <ApplyModal key={job.id} jobId={job.id} jobTitle={job.title} onClose={() => setApplyOpen(false)} />}
       <nav className="job-profile__breadcrumb" aria-label="Đường dẫn"><Link to="/">Trang chủ</Link><span>/</span><Link to="/#jobs">Việc làm</Link><span>/</span><span>{job.title}</span></nav>
       <div className="job-detail__header">
         {job.company?.logoUrl ? <img className="job-profile__logo" src={job.company.logoUrl} alt={`Logo ${job.companyName}`} /> : <div className="job-detail__company-mark" data-color={job.companyColor}>
@@ -77,11 +83,12 @@ export function JobDetailPage() {
         <div className="job-detail__actions">
           <button
             className="button button-primary job-detail__apply"
+            onClick={() => { if (!token) navigate('/login'); else setApplyOpen(true) }}
             type="button"
           >
             Ứng tuyển
           </button>
-          <button aria-label="Lưu công việc" title="Lưu công việc" className="job-detail__save" type="button">
+          <button aria-label="Lưu công việc" title="Lưu công việc" aria-pressed={savedIds.includes(job.id)} onClick={() => toggleSaved(job.id)} className="job-detail__save" type="button">
             <Icon name="bookmark" />
           </button>
         </div>

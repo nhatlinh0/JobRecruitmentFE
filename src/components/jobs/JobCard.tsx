@@ -28,7 +28,7 @@ export function JobCard({ job, isSaved, onToggleSave }: JobCardProps) {
           )}
         </div>
         <button
-          aria-label={isSaved ? `Bỏ lưu ${job.title}` : `Lưu ${job.title}`}
+          aria-label={isSaved ? `Đã lưu ${job.title}` : `Lưu ${job.title}`}
           aria-pressed={isSaved}
           className={`save-button${isSaved ? ' is-saved' : ''}`}
           onClick={() => onToggleSave(job.id)}

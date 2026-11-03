@@ -1,5 +1,8 @@
 import { useMemo, useSyncExternalStore } from 'react'
 import { useAuth } from './useAuth'
+import { useNavigate } from 'react-router-dom'
+
+const pendingSaves = new Set<string>()
 
 const SAVED_JOBS_EVENT = 'saved-jobs-changed'
 
@@ -22,18 +25,32 @@ function parseIds(value: string | null): number[] {
 }
 
 export function useSavedJobs() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
+  const navigate = useNavigate()
   const key = `saved_jobs:${user?.sub ?? 'guest'}`
   const stored = useSyncExternalStore(subscribe, () => localStorage.getItem(key), () => null)
   const savedIds = useMemo(() => parseIds(stored), [stored])
 
-  function toggleSaved(jobId: number) {
-    const current = parseIds(localStorage.getItem(key))
-    const next = current.includes(jobId)
-        ? current.filter((id) => id !== jobId)
-        : [...current, jobId]
-    localStorage.setItem(key, JSON.stringify(next))
-    window.dispatchEvent(new Event(SAVED_JOBS_EVENT))
+  async function toggleSaved(jobId: number) {
+    if (!token) { navigate('/login'); return }
+    const requestKey = `${key}:${jobId}`
+    if (pendingSaves.has(requestKey)) return
+    pendingSaves.add(requestKey)
+    try {
+      const response = await fetch(`/api/api/v1/users/saved/${jobId}`, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(15000) })
+      if (!response.ok) {
+        const text = await response.text()
+        let message = `Không thể lưu công việc (HTTP ${response.status}).`
+        try { const body: unknown = JSON.parse(text); if (body && typeof body === 'object' && 'message' in body && typeof body.message === 'string') message = body.message } catch { /* Giữ thông báo mặc định. */ }
+        throw new Error(message)
+      }
+      const current = parseIds(localStorage.getItem(key))
+      localStorage.setItem(key, JSON.stringify([...new Set([...current, jobId])]))
+      window.dispatchEvent(new Event(SAVED_JOBS_EVENT))
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { type: 'success', message: 'Đã lưu công việc.' } }))
+    } catch (error) {
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { type: 'error', message: error instanceof Error ? error.message : 'Không thể lưu công việc.' } }))
+    } finally { pendingSaves.delete(requestKey) }
   }
 
   return { savedIds, toggleSaved }

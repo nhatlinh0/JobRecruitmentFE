@@ -79,7 +79,7 @@ export async function fetchCompaniesByIndustry(slug: string, signal: AbortSignal
   return items.map(parseHomeCompany)
 }
 
-function parseHomeJob(entry: Record<string, unknown>): Job {
+export function parseHomeJob(entry: Record<string, unknown>): Job {
     const job = parseRecruitJob(entry)
     const type = job.workType === 'REMOTE' ? 'Remote' : job.workType === 'HYBRID' ? 'Hybrid' : job.workType === 'ONSITE' ? 'Onsite' : job.workType
     const company = entry.company && typeof entry.company === 'object' ? entry.company as Record<string, unknown> : null
