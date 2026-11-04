@@ -20,12 +20,22 @@ import { CandidateSearchPage } from './pages/CandidateSearchPage'
 import { ChangePasswordPage } from './pages/ChangePasswordPage'
 import { UserJobsPage } from './pages/UserJobsPage'
 import { AppliedJobsPage } from './pages/AppliedJobsPage'
+import { AdminPage } from './pages/AdminPage'
+import { AdminCompaniesPage } from './pages/AdminCompaniesPage'
+import { AdminUsersPage } from './pages/AdminUsersPage'
+import { AdminJobsPage } from './pages/AdminJobsPage'
+import { AdminResetPasswordPage } from './pages/AdminResetPasswordPage'
 
 function App() {
   return (
     <MainLayout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/companies" element={<AdminCompaniesPage />} />
+        <Route path="/admin/users" element={<AdminUsersPage />} />
+        <Route path="/admin/jobs" element={<AdminJobsPage />} />
+        <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />

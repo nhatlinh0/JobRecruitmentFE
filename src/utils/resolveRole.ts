@@ -6,7 +6,7 @@ export function resolveRole(value: unknown): Role | null {
   if (value === 3) return 'RECRUIT'
   if (typeof value === 'string') {
     const role = value.trim().toUpperCase().replace(/^ROLE_/, '')
-    if (role === 'USER' || role === 'RECRUIT') return role
+    if (role === 'USER' || role === 'RECRUIT' || role === 'ADMIN') return role
     return null
   }
   if (value && typeof value === 'object') {

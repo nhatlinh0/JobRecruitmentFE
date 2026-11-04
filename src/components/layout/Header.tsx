@@ -56,7 +56,7 @@ export function Header() {
     <header className="site-header" ref={headerRef}>
       <Logo />
       <nav className={`main-nav${menuOpen ? ' is-open' : ''}`} aria-label="Điều hướng chính">
-        {user?.role !== 'RECRUIT' && (
+        {user?.role !== 'RECRUIT' && user?.role !== 'ADMIN' && (
           <>
             {navItems.map((item, index) => (
               <a

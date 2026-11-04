@@ -1,0 +1,10 @@
+.admin-jobs .post-list__card { overflow-x: auto; }
+.admin-jobs .post-table { min-width: 1240px; }
+.admin-jobs .post-status { white-space: nowrap; }
+.admin-jobs__filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.admin-jobs__filters button { padding: 10px 18px; border: 1px solid #dce6df; border-radius: 9px; background: #fff; color: #526459; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.admin-jobs__filters button[aria-pressed="true"] { background: #246347; border-color: #246347; color: #fff; }
+.admin-jobs__filters button:disabled { opacity: .5; cursor: not-allowed; }
+.admin-jobs__domain { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; }
+.admin-job-detail__skills { display: flex; flex-wrap: wrap; gap: 8px; font-size: 14px; }
+.admin-job-detail__skills span { padding: 7px 12px; border: 1px solid #dce9df; border-radius: 8px; color: #286248; background: #f1f7f2; }

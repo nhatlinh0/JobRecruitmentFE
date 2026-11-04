@@ -1,0 +1,14 @@
+.admin-users .post-list__card { overflow-x: auto; }
+.admin-users .post-table { min-width: 920px; }
+.admin-users .post-status { white-space: nowrap; }
+.admin-users__search { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+.admin-users__search label { display: grid; gap: 8px; flex: 1 1 250px; max-width: 420px; font-size: 14px; font-weight: 600; }
+.admin-users__search input { width: 100%; box-sizing: border-box; min-height: 44px; padding: 10px 14px; border: 1px solid #d6e4d9; border-radius: 9px; background: #fff; color: var(--ink); font: inherit; }
+.admin-users__search input:focus { outline: 2px solid #9ccbb0; outline-offset: 2px; }
+.admin-users__search button { min-height: 44px; }
+.admin-users__role { display: inline-block; border: 1px solid #e1e7e2; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 650; color: #5b6d60; background: #f5f8f5; }
+.admin-users__actions { display: flex; gap: 8px; }
+.admin-users__actions button { border: 1px solid #d6e4d9; border-radius: 7px; padding: 8px 12px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.admin-users__active { background: #edf6ef; color: #286b47; }
+.admin-users__actions .admin-users__inactive { border-color: #e9d8bc; background: #fff8eb; color: #93611e; }
+.admin-users__actions button:disabled { opacity: .4; cursor: not-allowed; }

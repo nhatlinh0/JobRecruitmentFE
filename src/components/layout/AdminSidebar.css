@@ -1,0 +1,5 @@
+.admin-sidebar__heading { display: grid; gap: 8px; margin: 0 12px 22px; padding: 0 4px 20px; border-bottom: 1px solid #dfe8e1; }
+.admin-sidebar__heading span { font-size: 10px; font-weight: 750; letter-spacing: 2px; color: var(--green); }
+.admin-sidebar__heading strong { font-size: 15px; color: var(--ink); }
+.admin-sidebar__link { display: flex; align-items: center; gap: 10px; }
+.admin-sidebar__link svg { width: 18px; height: 18px; flex-shrink: 0; }

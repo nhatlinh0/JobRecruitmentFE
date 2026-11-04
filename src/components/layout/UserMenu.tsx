@@ -39,7 +39,7 @@ export function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
       : { label: 'Hồ sơ của tôi', to: '/update-profile' }
 
   const items = [
-    profileItem,
+    ...(user.role === 'ADMIN' ? [] : [profileItem]),
     ...(user.role === 'USER' ? [
       { label: 'Việc làm đã lưu', to: '/saved-jobs' },
       { label: 'Việc làm đã ứng tuyển', to: '/applied-jobs' },

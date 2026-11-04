@@ -8,6 +8,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useJobSearch } from '../hooks/useJobSearch'
 import { useSavedJobs } from '../hooks/useSavedJobs'
 import { RecruitHome } from './RecruitHome'
+import { AdminPage } from './AdminPage'
 import { fetchHomeCompanies, fetchHomeJobs, type HomeCompany } from '../services/home'
 import type { Job } from '../types/job'
 import './HomePage.css'
@@ -26,7 +27,7 @@ export function HomePage() {
   const { savedIds, toggleSaved } = useSavedJobs()
 
   useEffect(() => {
-    if (user?.role === 'RECRUIT') return
+    if (user?.role === 'RECRUIT' || user?.role === 'ADMIN') return
     const controller = new AbortController()
     fetchHomeCompanies(controller.signal).then((items) => {
       if (!controller.signal.aborted) { setCompanies(items); setLoadState((state) => ({ ...state, companies: true, companyError: '' })) }
@@ -46,6 +47,7 @@ export function HomePage() {
   }
 
   if (user?.role === 'RECRUIT') return <RecruitHome />
+  if (user?.role === 'ADMIN') return <AdminPage />
 
   return (
     <div className="home-page">
