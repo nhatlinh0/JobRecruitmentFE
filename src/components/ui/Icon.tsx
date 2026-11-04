@@ -1,4 +1,5 @@
 export type IconName =
+  | 'edit'
   | 'filter'
   | 'arrow'
   | 'bookmark'
@@ -19,6 +20,7 @@ export type IconName =
   | 'trend'
 
 const iconPaths: Record<IconName, string> = {
+  edit: 'm16 3 5 5M4 20l4-1L21 6a2.1 2.1 0 0 0-3-3L5 16l-1 4Z',
   filter: 'M4 7h16M7 12h10M10 17h4M8 4v6m8-1v6m-4-1v6',
   check: 'm5 12 4 4L19 6',
   close: 'm6 6 12 12M6 18 18 6',

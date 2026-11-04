@@ -1,0 +1,16 @@
+.admin-industries .post-list__card { overflow-x: auto; }
+.admin-industries .post-table { min-width: 850px; }
+.admin-industries__description { min-width: 200px; max-width: 380px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.admin-industries__actions { display: flex; gap: 8px; }
+.admin-industries__actions button { display: grid; place-items: center; width: 36px; height: 36px; background: #edf6ef; color: #286b47; border: 1px solid #d6e4d9; border-radius: 8px; cursor: pointer; }
+.admin-industries__actions svg { width: 18px; height: 18px; }
+.admin-industries__actions .admin-industries__delete { background: #fff2f0; border-color: #f0d7d2; color: #b53b32; }
+.admin-industries__form { margin-top: 28px; padding: 28px; background: #fff; border: 1px solid #e0e9e2; border-radius: 16px; display: grid; gap: 18px; }
+.admin-industries__form h2 { margin: 0 0 4px; font-size: 22px; }
+.admin-industries__form label { display: grid; gap: 8px; font-size: 14px; font-weight: 600; }
+.admin-industries__form input, .admin-industries__form textarea { width: 100%; box-sizing: border-box; border: 1px solid #d6e4d9; border-radius: 9px; padding: 12px 14px; background: #fff; color: var(--ink); font: inherit; }
+.admin-industries__form textarea { resize: vertical; line-height: 1.7; }
+.admin-industries__form input[readonly] { background: #f4f7f4; color: var(--muted); }
+.admin-industries__form input:focus, .admin-industries__form textarea:focus { outline: 2px solid #9ccbb0; outline-offset: 2px; }
+.admin-industries__hint { margin: -10px 0 0; color: var(--muted); font-size: 12px; }
+.admin-industries__form-actions { display: flex; flex-wrap: wrap; gap: 10px; }

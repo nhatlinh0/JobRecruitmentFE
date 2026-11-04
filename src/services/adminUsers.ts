@@ -18,7 +18,7 @@ export interface AdminUserPage {
 export async function fetchAdminUsers(token: string, page: number, size: number, signal: AbortSignal, email = ''): Promise<AdminUserPage> {
   const headers: Record<string, string> = { Authorization: `Bearer ${token}`, Accept: 'application/json' }
   if (email) headers['Content-Type'] = 'application/json'
-  const response = await fetch(email ? `/api/admin/users/email?page=${page}&size=${size}` : `/api/api/v1/users/get-all?page=${page}&size=${size}`, {
+  const response = await fetch(email ? `/api/admin/users/email?page=${page}&size=${size}` : `/api/api/v1/users/get-all-users?page=${page}&size=${size}`, {
     method: email ? 'POST' : 'GET', headers, signal,
     ...(email ? { body: JSON.stringify({ email }) } : {}),
   })

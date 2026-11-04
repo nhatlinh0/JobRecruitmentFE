@@ -25,6 +25,8 @@ import { AdminCompaniesPage } from './pages/AdminCompaniesPage'
 import { AdminUsersPage } from './pages/AdminUsersPage'
 import { AdminJobsPage } from './pages/AdminJobsPage'
 import { AdminResetPasswordPage } from './pages/AdminResetPasswordPage'
+import { AdminIndustriesPage } from './pages/AdminIndustriesPage'
+import { AdminDomainsPage } from './pages/AdminDomainsPage'
 
 function App() {
   return (
@@ -36,6 +38,9 @@ function App() {
         <Route path="/admin/users" element={<AdminUsersPage />} />
         <Route path="/admin/jobs" element={<AdminJobsPage />} />
         <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
+        <Route path="/admin/industries" element={<AdminIndustriesPage />} />
+        <Route path="/admin/domains" element={<AdminDomainsPage />} />
+        <Route path="/admin/skills" element={<AdminPage section="skills" />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />

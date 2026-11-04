@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { performCompanyAction, fetchAdminCompanies, type CompanyAction, type AdminCompany, type AdminCompanyPage, type CompanyStatusFilter } from '../services/adminCompanies'
@@ -61,6 +61,8 @@ export function AdminCompaniesPage() {
 function CompaniesContent({ token }: { token: string }) {
   const [page, setPage] = useState(0)
   const [filter, setFilter] = useState<CompanyStatusFilter>('')
+  const [name, setName] = useState('')
+  const [searchName, setSearchName] = useState('')
   const [data, setData] = useState<AdminCompanyPage | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -86,7 +88,7 @@ function CompaniesContent({ token }: { token: string }) {
   }
   useEffect(() => {
     const controller = new AbortController()
-    fetchAdminCompanies(token, page, 10, controller.signal, filter).then((result) => {
+    fetchAdminCompanies(token, page, 10, controller.signal, filter, searchName).then((result) => {
       if (controller.signal.aborted) return
       if (result.totalPages > 0 && page >= result.totalPages) {
         setPage(result.totalPages - 1)
@@ -97,13 +99,22 @@ function CompaniesContent({ token }: { token: string }) {
       if (!controller.signal.aborted) setError(error instanceof Error ? error.message : 'Không thể tải công ty.')
     }).finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [token, page, retry, filter])
+  }, [token, page, retry, filter, searchName])
+  function search(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!name.trim()) return
+    setLoading(true); setError(''); setPage(0); setFilter(''); setSearchName(name.trim()); setRetry((value) => value + 1)
+  }
   return <section className="post-list admin-companies">
     <div className="post-list__heading"><span className="section-kicker">QUẢN TRỊ HỆ THỐNG</span><h1>Quản lý công ty</h1><p>Thông tin doanh nghiệp và trạng thái xét duyệt trên hệ thống.</p></div>
+    <form className="admin-companies__search" onSubmit={search}>
+      <label htmlFor="admin-company-name">Tên công ty<input id="admin-company-name" name="name" type="text" required value={name} disabled={updatingId !== null} onChange={(event) => setName(event.target.value)} /></label>
+      <button type="submit" className="button button-primary" disabled={loading || updatingId !== null}>Tìm</button>
+    </form>
     <div className="admin-companies__filters" role="group" aria-label="Lọc công ty theo trạng thái">
-      {([{ value: '', label: 'Tất cả' }, { value: 'ACCEPTED', label: 'Đã duyệt' }, { value: 'REJECT', label: 'Loại' }, { value: 'SUSPEND', label: 'Tạm ngưng' }] as const).map((item) => <button key={item.value} type="button" aria-pressed={filter === item.value} disabled={updatingId !== null} onClick={() => {
-        if (filter === item.value) return
-        setLoading(true); setError(''); setPage(0); setFilter(item.value)
+      {([{ value: '', label: 'Tất cả' }, { value: 'ACCEPTED', label: 'Đã duyệt' }, { value: 'REJECT', label: 'Loại' }, { value: 'SUSPEND', label: 'Tạm ngưng' }] as const).map((item) => <button key={item.value} type="button" aria-pressed={!searchName && filter === item.value} disabled={updatingId !== null} onClick={() => {
+        if (filter === item.value && !searchName) return
+        setLoading(true); setError(''); setPage(0); setFilter(item.value); setSearchName(''); setName('')
       }}>{item.label}</button>)}
     </div>
     {loading ? <p role="status">Đang tải danh sách công ty...</p> : error ? <div role="alert">{error} <button className="button button-outline" type="button" onClick={() => { setLoading(true); setError(''); setRetry((value) => value + 1) }}>Thử lại</button></div> : data && <>
@@ -115,7 +126,7 @@ function CompaniesContent({ token }: { token: string }) {
           <td><button className="button button-outline admin-companies__details" type="button" onClick={() => setSelected(company)}><Icon name="eye" /> Xem chi tiết</button></td>
           <td><div className="admin-companies__actions" aria-busy={updatingId === company.id}><button type="button" className="admin-companies__action admin-companies__action--accept" disabled={updatingId !== null || company.status === 'ACCEPTED'} onClick={() => changeStatus(company, 'accept')}>Duyệt</button><button type="button" className="admin-companies__action admin-companies__action--reject" disabled={updatingId !== null || company.status === 'REJECT'} onClick={() => changeStatus(company, 'reject')}>Loại</button><button type="button" className="admin-companies__action" disabled={updatingId !== null || company.status === 'SUSPEND'} onClick={() => changeStatus(company, 'suspend')}>Tạm ngưng</button></div></td>
         </tr>)}
-        {!data.content.length && <tr><td className="post-table__empty" colSpan={9}>Chưa có công ty nào.</td></tr>}
+        {!data.content.length && <tr><td className="post-table__empty" colSpan={9}>{searchName ? 'Không tìm thấy công ty phù hợp.' : 'Chưa có công ty nào.'}</td></tr>}
       </tbody></table></div>
       <Pagination page={data.page} totalPages={data.totalPages} totalElements={data.totalElements} label="công ty" onChange={(next) => { setLoading(true); setError(''); setPage(next) }} />
     </>}

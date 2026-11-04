@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { fetchAdminJobs, performJobAction, type AdminJob, type AdminJobPage, type JobAction, type JobStatusFilter } from '../services/adminJobs'
@@ -58,6 +58,8 @@ export function AdminJobsPage() {
 function JobsContent({ token }: { token: string }) {
   const [page, setPage] = useState(0)
   const [filter, setFilter] = useState<JobStatusFilter>('')
+  const [title, setTitle] = useState('')
+  const [searchTitle, setSearchTitle] = useState('')
   const [data, setData] = useState<AdminJobPage | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -67,7 +69,7 @@ function JobsContent({ token }: { token: string }) {
   const updating = useRef(false)
   useEffect(() => {
     const controller = new AbortController()
-    fetchAdminJobs(page, 10, controller.signal, filter, token).then((result) => {
+    fetchAdminJobs(page, 10, controller.signal, filter, token, searchTitle).then((result) => {
       if (controller.signal.aborted) return
       if (result.totalPages > 0 && page >= result.totalPages) {
         setPage(result.totalPages - 1)
@@ -78,7 +80,12 @@ function JobsContent({ token }: { token: string }) {
       if (!controller.signal.aborted) setError(error instanceof Error ? error.message : 'Không thể tải công việc.')
     }).finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [page, retry, filter, token])
+  }, [page, retry, filter, token, searchTitle])
+  function search(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!title.trim()) return
+    setLoading(true); setError(''); setPage(0); setFilter(''); setSearchTitle(title.trim()); setRetry((value) => value + 1)
+  }
   async function changeStatus(job: AdminJob, action: JobAction) {
     if (updating.current) return
     updating.current = true
@@ -96,10 +103,14 @@ function JobsContent({ token }: { token: string }) {
   }
   return <section className="post-list admin-jobs">
     <div className="post-list__heading"><span className="section-kicker">QUẢN TRỊ HỆ THỐNG</span><h1>Quản lý công việc</h1><p>Danh sách công việc và trạng thái xét duyệt trên hệ thống.</p></div>
+    <form className="admin-companies__search" onSubmit={search}>
+      <label htmlFor="admin-job-title-search">Tiêu đề công việc<input id="admin-job-title-search" name="title" type="text" required value={title} disabled={updatingId !== null} onChange={(event) => setTitle(event.target.value)} /></label>
+      <button type="submit" className="button button-primary" disabled={loading || updatingId !== null}>Tìm</button>
+    </form>
     <div className="admin-jobs__filters" role="group" aria-label="Lọc công việc theo trạng thái">
-      {([{ value: '', label: 'Tất cả' }, { value: 'ACCEPTED', label: 'Đã duyệt' }, { value: 'REJECT', label: 'Loại' }, { value: 'SUSPEND', label: 'Tạm ngưng' }] as const).map((item) => <button key={item.value} type="button" aria-pressed={filter === item.value} disabled={updatingId !== null} onClick={() => {
-        if (filter === item.value) return
-        setLoading(true); setError(''); setPage(0); setFilter(item.value)
+      {([{ value: '', label: 'Tất cả' }, { value: 'ACCEPTED', label: 'Đã duyệt' }, { value: 'REJECT', label: 'Loại' }, { value: 'SUSPEND', label: 'Tạm ngưng' }] as const).map((item) => <button key={item.value} type="button" aria-pressed={!searchTitle && filter === item.value} disabled={updatingId !== null} onClick={() => {
+        if (filter === item.value && !searchTitle) return
+        setLoading(true); setError(''); setPage(0); setFilter(item.value); setSearchTitle(''); setTitle('')
       }}>{item.label}</button>)}
     </div>
     {loading ? <p role="status">Đang tải danh sách công việc...</p> : error ? <div role="alert">{error} <button type="button" className="button button-outline" onClick={() => { setLoading(true); setError(''); setRetry((value) => value + 1) }}>Thử lại</button></div> : data && <>
@@ -107,7 +118,7 @@ function JobsContent({ token }: { token: string }) {
         {data.content.map((job, index) => <tr key={job.id}><td>{data.page * data.size + index + 1}</td><td className="post-table__id">#{job.id}</td><td><strong>{job.title}</strong><small className="admin-jobs__domain">{job.domain?.name}</small></td><td>{job.company?.name || '—'}</td><td>{job.city || '—'}</td><td>{salary(job)}</td><td><JobStatus value={job.status} /></td><td><button type="button" className="button button-outline admin-companies__details" onClick={() => setSelected(job)}>Xem chi tiết</button></td><td><div className="admin-companies__actions" aria-busy={updatingId === job.id}>
           {(['accept', 'reject', 'suspend'] as const).map((action) => <button key={action} type="button" className={`admin-companies__action ${action !== 'suspend' ? `admin-companies__action--${action}` : ''}`} disabled={updatingId !== null || job.status === ({ accept: 'ACCEPTED', reject: 'REJECT', suspend: 'SUSPEND' }[action])} onClick={() => changeStatus(job, action)}>{{ accept: 'Duyệt', reject: 'Từ chối', suspend: 'Tạm ngưng' }[action]}</button>)}
         </div></td></tr>)}
-        {!data.content.length && <tr><td colSpan={9} className="post-table__empty">Chưa có công việc nào.</td></tr>}
+        {!data.content.length && <tr><td colSpan={9} className="post-table__empty">{searchTitle ? 'Không tìm thấy công việc phù hợp.' : 'Chưa có công việc nào.'}</td></tr>}
       </tbody></table></div>
       <Pagination page={data.page} totalPages={data.totalPages} totalElements={data.totalElements} label="công việc" onChange={(next) => { setLoading(true); setError(''); setPage(next) }} />
     </>}

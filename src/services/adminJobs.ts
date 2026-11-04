@@ -53,20 +53,24 @@ function parseJob(value: unknown): AdminJob {
 
 export type JobStatusFilter = '' | 'ACCEPTED' | 'REJECT' | 'SUSPEND'
 
-export async function fetchAdminJobs(page: number, size: number, signal: AbortSignal, status: JobStatusFilter = '', token?: string): Promise<AdminJobPage> {
+export async function fetchAdminJobs(page: number, size: number, signal: AbortSignal, status: JobStatusFilter = '', token?: string, title = ''): Promise<AdminJobPage> {
   const params = new URLSearchParams({ page: String(page), size: String(size) })
   const headers: Record<string, string> = { Accept: 'application/json' }
-  if (status) {
-    params.set('status', status)
+  if (status || title) {
+    if (status && !title) params.set('status', status)
     if (token) headers.Authorization = `Bearer ${token}`
   }
-  const response = await fetch(`${status ? '/api/admin/jobs/status' : '/api/api/v1/jobs'}?${params}`, { headers, signal })
+  const endpoint = title ? `/api/admin/jobs/title/${encodeURIComponent(title)}` : status ? '/api/admin/jobs/status' : '/api/api/v1/jobs'
+  const response = await fetch(`${endpoint}?${params}`, { headers, signal })
+  if (title && response.status === 404) return { content: [], page: 0, size, totalElements: 0, totalPages: 0, last: true }
   if (!response.ok) throw new Error(`Không thể tải danh sách công việc (HTTP ${response.status}).`)
   const raw: unknown = await response.json()
   const body = raw && typeof raw === 'object' && 'data' in raw ? raw.data : raw
-  if (!body || typeof body !== 'object' || !('content' in body) || !Array.isArray(body.content)) throw new Error('Response danh sách công việc không hợp lệ.')
-  const meta = body as Record<string, unknown>
-  return { content: body.content.map(parseJob), page: Number(meta.page ?? page), size: Number(meta.size ?? size), totalElements: Number(meta.totalElements ?? 0), totalPages: Number(meta.totalPages ?? 0), last: meta.last === true }
+  const paged = body && typeof body === 'object' && 'content' in body && Array.isArray(body.content) ? body : null
+  const values = paged ? paged.content as unknown[] : title && Array.isArray(body) ? body : title && body && typeof body === 'object' && 'id' in body ? [body] : title && body == null ? [] : null
+  if (!values) throw new Error('Response danh sách công việc không hợp lệ.')
+  const meta = (paged ?? {}) as Record<string, unknown>
+  return { content: values.map(parseJob), page: Number(meta.page ?? (paged ? page : 0)), size: Number(meta.size ?? size), totalElements: Number(meta.totalElements ?? values.length), totalPages: Number(meta.totalPages ?? (values.length ? 1 : 0)), last: paged ? meta.last === true : true }
 }
 
 export type JobAction = 'accept' | 'reject' | 'suspend'
