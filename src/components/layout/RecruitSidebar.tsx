@@ -4,13 +4,7 @@ import './RecruitSidebar.css'
 
 const menu = [
   { label: 'Trang chủ', to: '/' },
-  {
-    label: 'Quản lý công ty',
-    children: [
-      { label: 'Danh sách nhân sự', to: '/recruit/staff' },
-      { label: 'Thêm nhân sự', to: '/recruit/staff/new' },
-    ],
-  },
+  { label: 'Quản lý công ty', to: '/my-company' },
   {
     label: 'Quản lý bài đăng',
     children: [
@@ -18,7 +12,6 @@ const menu = [
       { label: 'Danh sách bài đăng', to: '/recruit/posts' },
     ],
   },
-  { label: 'Tìm kiếm ứng viên', to: '/recruit/candidates' },
   { label: 'Nâng cấp gói', to: '/recruit/upgrade' },
 ]
 

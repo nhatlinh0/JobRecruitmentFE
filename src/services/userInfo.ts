@@ -1,4 +1,4 @@
-export interface ProfileOption { id: number; name: string }
+export interface ProfileOption { id: number; name: string; slug?: string }
 export interface UserInfoPayload {
   salaryMax: number | null
   salaryMin: number | null
@@ -52,7 +52,7 @@ export function parseOptions(value: unknown): ProfileOption[] {
     const id = Number(entry.id)
     const name = entry.name ?? entry.domainName ?? entry.skillName
     if (!Number.isInteger(id) || typeof name !== 'string') throw new Error('Chuyên môn/kỹ năng thiếu ID hoặc tên.')
-    return { id, name }
+    return { id, name, ...(typeof entry.slug === 'string' ? { slug: entry.slug } : {}) }
   })
 }
 
@@ -77,7 +77,7 @@ export async function fetchProfileOptions(path: string, token: string, signal: A
 export async function profileRequest(path: string, token: string, options: RequestInit = {}): Promise<unknown> {
   const response = await fetch(`/api/api/v1/${path}`, {
     ...options,
-    headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, ...(options.body && !(options.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}) },
+    headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(options.body && !(options.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}) },
     signal: options.signal ?? AbortSignal.timeout(15000),
   })
   if (path === 'user-infos' && (!options.method || options.method === 'GET') && response.status === 404) return null

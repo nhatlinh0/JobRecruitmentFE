@@ -4,9 +4,7 @@ import './HeroSection.css'
 
 interface HeroSectionProps {
   keyword: string
-  city: string
   onKeywordChange: (value: string) => void
-  onCityChange: (value: string) => void
   onSearch: () => void
 }
 
@@ -14,9 +12,7 @@ const popularKeywords = ['React', 'Java', 'Python', 'Remote']
 
 export function HeroSection({
   keyword,
-  city,
   onKeywordChange,
-  onCityChange,
   onSearch,
 }: HeroSectionProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -41,21 +37,11 @@ export function HeroSection({
         <form className="search-panel" onSubmit={handleSubmit}>
           <label className="search-field">
             <Icon name="search" />
-            <span className="visually-hidden">Vị trí, kỹ năng hoặc công ty</span>
+            <span className="visually-hidden">Tiêu đề công việc</span>
             <input
               onChange={(event) => onKeywordChange(event.target.value)}
-              placeholder="Vị trí, kỹ năng hoặc công ty"
+              placeholder="Tiêu đề công việc"
               value={keyword}
-            />
-          </label>
-          <span className="search-divider" />
-          <label className="search-field location-field">
-            <Icon name="location" />
-            <span className="visually-hidden">Thành phố</span>
-            <input
-              onChange={(event) => onCityChange(event.target.value)}
-              placeholder="Thành phố"
-              value={city}
             />
           </label>
           <button className="button button-primary search-button" type="submit">

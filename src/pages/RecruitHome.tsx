@@ -14,11 +14,6 @@ const quickActions = [
     to: '/recruit/posts/new',
   },
   {
-    title: 'Tìm kiếm ứng viên',
-    description: 'Chủ động tìm kiếm ứng viên theo kỹ năng và kinh nghiệm.',
-    to: '/recruit/candidates',
-  },
-  {
     title: 'Nâng cấp gói',
     description: 'Mở khóa thêm lượt đăng tin và tính năng nổi bật.',
     to: '/recruit/upgrade',
@@ -35,8 +30,8 @@ export function RecruitHome() {
         <h1>Xin chào, {user?.username ?? 'nhà tuyển dụng'}!</h1>
         <p>
           Chào mừng bạn đến với JobSeeker — nơi kết nối doanh nghiệp với hàng nghìn ứng viên
-          công nghệ chất lượng. Đăng tin tuyển dụng, quản lý nhân sự và tìm kiếm ứng viên
-          phù hợp, tất cả trong một bảng điều khiển.
+          công nghệ chất lượng. Cập nhật thông tin công ty và quản lý tin tuyển dụng
+          trong một bảng điều khiển.
         </p>
       </div>
 

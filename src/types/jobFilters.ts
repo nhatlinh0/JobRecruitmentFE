@@ -3,6 +3,9 @@ import { ALL_FIELDS } from './job'
 export interface JobFilters {
   workType: string
   field: string
+  domainId?: number
+  domainSlug?: string
+  skillSlugs?: string[]
   experience: [number, number]
   salary: [number, number]
   negotiable: boolean

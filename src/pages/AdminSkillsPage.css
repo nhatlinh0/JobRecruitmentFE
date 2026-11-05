@@ -1,0 +1,3 @@
+.admin-skills__domain { display: grid; gap: 10px; max-width: 480px; margin-bottom: 24px; font-size: 14px; font-weight: 600; }
+.admin-skills__domain select { width: 100%; padding: 12px 14px; border: 1px solid #d6e4d9; border-radius: 9px; background: #fff; color: var(--ink); font: inherit; }
+.admin-skills__domain select:focus { outline: 2px solid #9ccbb0; outline-offset: 2px; }

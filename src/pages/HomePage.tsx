@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { CtaBanner } from '../components/home/CtaBanner'
 import { FeaturedJobs } from '../components/home/FeaturedJobs'
 import { HeroSection } from '../components/home/HeroSection'
@@ -17,6 +18,8 @@ const EMPTY_JOBS: Job[] = []
 
 export function HomePage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const [title, setTitle] = useState('')
   const [remoteJobs, setRemoteJobs] = useState<Job[]>(EMPTY_JOBS)
   const [companies, setCompanies] = useState<HomeCompany[]>([])
   const [loadState, setLoadState] = useState({ companies: false, jobs: false, companyError: '', jobError: '' })
@@ -52,11 +55,9 @@ export function HomePage() {
   return (
     <div className="home-page">
       <HeroSection
-        city={search.city}
-        keyword={search.keyword}
-        onCityChange={search.setCity}
-        onKeywordChange={search.setKeyword}
-        onSearch={scrollToJobs}
+        keyword={title}
+        onKeywordChange={setTitle}
+        onSearch={() => { if (title.trim()) navigate(`/jobs/search?${new URLSearchParams({ title: title.trim() })}`); else scrollToJobs() }}
       />
       {!loadState.companies ? <div className="home-page__status" role="status"><span className="section-kicker">NHÀ TUYỂN DỤNG</span><p>Đang tải công ty...</p></div> : loadState.companyError ? <div className="home-page__status" role="alert">{loadState.companyError} <button className="button button-outline" type="button" onClick={() => setRetry((value) => value + 1)}>Thử lại</button></div> : <CompanyDirectory items={companies} />}
       {!loadState.jobs ? <div className="home-page__status" role="status"><span className="section-kicker">CƠ HỘI NGHỀ NGHIỆP</span><p>Đang tải việc làm...</p></div> : loadState.jobError ? <div className="home-page__status" role="alert">{loadState.jobError} <button className="button button-outline" type="button" onClick={() => setRetry((value) => value + 1)}>Thử lại</button></div> :

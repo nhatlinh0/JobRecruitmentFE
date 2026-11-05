@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ALL_FIELDS, type Job } from '../../types/job'
 import { JobFilterOverlay } from '../jobs/JobFilterOverlay'
 import { defaultJobFilters } from '../../types/jobFilters'
@@ -26,12 +27,13 @@ export function FeaturedJobs({
   onToggleSave,
   onReset,
 }: FeaturedJobsProps) {
+  const navigate = useNavigate()
   const [filters, setFilters] = useState(defaultJobFilters)
   const [filterOpen, setFilterOpen] = useState(false)
   const [pagination, setPagination] = useState({ jobs, filters, page: 0 })
   const matches = jobs.filter((job) => {
     const experience = job.experience ?? { min: 0, max: 0 }
-    return (!filters.workType || job.workType === filters.workType)
+    return (!filters.workType || job.workType.toUpperCase().replaceAll(' ', '_') === filters.workType)
       && experience.max >= filters.experience[0] && experience.min <= filters.experience[1]
       && (filters.negotiable ? job.salary === null : job.salary ? (job.salary.max >= filters.salary[0] && job.salary.min <= filters.salary[1]) : filters.salary[0] === 0 && filters.salary[1] === 100)
       && filters.skills.every((skill) => job.skills.includes(skill))
@@ -53,7 +55,15 @@ export function FeaturedJobs({
       {(filters !== defaultJobFilters || field !== ALL_FIELDS) && <div className="jobs-filter-summary"><span>{matches.length} việc làm phù hợp{field !== ALL_FIELDS ? ` · ${field}` : ''}</span><button type="button" onClick={resetAll}>Xóa bộ lọc</button></div>}
       <JobList jobs={content} onReset={resetAll} onToggleSave={onToggleSave} savedIds={savedIds} />
       <Pagination page={page} totalPages={totalPages} totalElements={matches.length} label="việc làm" onChange={(nextPage) => setPagination({ jobs, filters, page: nextPage })} />
-      {filterOpen && <JobFilterOverlay value={{ ...filters, field }} onClose={() => setFilterOpen(false)} onApply={(next) => { setFilters(next); onFieldChange(next.field); setFilterOpen(false) }} />}
+      {filterOpen && <JobFilterOverlay value={{ ...filters, field }} onClose={() => setFilterOpen(false)} onApply={(next) => {
+        const params = new URLSearchParams({ experienceMin: String(next.experience[0]), experienceMax: String(next.experience[1]) })
+        if (next.workType) params.set('workingTypes', next.workType)
+        if (next.domainSlug) params.set('domainSlugs', next.domainSlug)
+        if (next.skillSlugs?.length) params.set('skillSlugs', next.skillSlugs.join(','))
+        if (!next.negotiable) { params.set('salaryMin', String(next.salary[0])); params.set('salaryMax', String(next.salary[1])) }
+        setFilters(next); onFieldChange(next.field); setFilterOpen(false)
+        navigate(`/jobs/filter?${params}`)
+      }} />}
     </section>
   )
 }

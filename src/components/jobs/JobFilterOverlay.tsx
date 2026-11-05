@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import * as Slider from '@radix-ui/react-slider'
-import { navGroups } from '../../data/navigation'
-import { ALL_FIELDS, type WorkType } from '../../types/job'
+import { ALL_FIELDS } from '../../types/job'
+import { useAuth } from '../../hooks/useAuth'
+import { fetchProfileOptions, type ProfileOption } from '../../services/userInfo'
+import { slugify } from '../../utils/slugify'
 import { defaultJobFilters, type JobFilters } from '../../types/jobFilters'
 import '../../pages/UpdateProfilePage.css'
 import './JobFilterOverlay.css'
 
-const workTypes: WorkType[] = ['Onsite', 'Hybrid', 'Remote']
+const workTypes = ['FULL_TIME', 'PART_TIME', 'REMOTE', 'HYBRID', 'FLEXIBLE'] as const
 
 function FilterRange({ label, value, max, unit, disabled = false, onChange }: { label: string; value: [number, number]; max: number; unit: string; disabled?: boolean; onChange: (value: [number, number]) => void }) {
   return <div className="profile-field profile-field--full">
@@ -21,6 +23,33 @@ function FilterRange({ label, value, max, unit, disabled = false, onChange }: { 
 
 export function JobFilterOverlay({ value, onApply, onClose }: { value: JobFilters; onApply: (filters: JobFilters) => void; onClose: () => void }) {
   const [draft, setDraft] = useState(value)
+  const { token } = useAuth()
+  const [fields, setFields] = useState<ProfileOption[]>([])
+  const [skills, setSkills] = useState<ProfileOption[]>([])
+  const [fieldsLoading, setFieldsLoading] = useState(true)
+  const [skillsLoading, setSkillsLoading] = useState(Boolean(value.domainId))
+  const [fieldsError, setFieldsError] = useState('')
+  const [skillsError, setSkillsError] = useState('')
+  const [retry, setRetry] = useState(0)
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchProfileOptions('domains', token ?? '', controller.signal).then((items) => {
+      if (!controller.signal.aborted) setFields(items)
+    }).catch((error: unknown) => {
+      if (!controller.signal.aborted) setFieldsError(error instanceof Error ? error.message : 'Không thể tải chuyên môn.')
+    }).finally(() => { if (!controller.signal.aborted) setFieldsLoading(false) })
+    return () => controller.abort()
+  }, [token, retry])
+  useEffect(() => {
+    if (!draft.domainId) return
+    const controller = new AbortController()
+    fetchProfileOptions(`domains/${draft.domainId}`, token ?? '', controller.signal).then((items) => {
+      if (!controller.signal.aborted) setSkills(items)
+    }).catch((error: unknown) => {
+      if (!controller.signal.aborted) setSkillsError(error instanceof Error ? error.message : 'Không thể tải kỹ năng.')
+    }).finally(() => { if (!controller.signal.aborted) setSkillsLoading(false) })
+    return () => controller.abort()
+  }, [draft.domainId, token, retry])
   const ref = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     const dialog = ref.current!
@@ -29,21 +58,29 @@ export function JobFilterOverlay({ value, onApply, onClose }: { value: JobFilter
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = previous; dialog.close() }
   }, [])
-  const fields = navGroups.find((group) => group.id === 'by-field')?.items ?? []
-  const skills = navGroups.find((group) => group.id === 'by-skill')?.items ?? []
   return <dialog ref={ref} className="job-filter" aria-labelledby="job-filter-title" onCancel={(event) => { event.preventDefault(); onClose() }} onClick={(event) => { if (event.target === event.currentTarget) onClose() }}>
     <div className="job-filter__surface">
       <header className="job-filter__header"><div><span className="section-kicker">TÌM CƠ HỘI PHÙ HỢP</span><h2 id="job-filter-title">Bộ lọc việc làm</h2></div><button type="button" className="job-filter__close" aria-label="Đóng bộ lọc" onClick={onClose}>×</button></header>
-      <form onSubmit={(event) => { event.preventDefault(); onApply(draft) }}>
+      <form onSubmit={(event) => {
+        event.preventDefault()
+        const domain = fields.find((item) => item.id === draft.domainId)
+        onApply({ ...draft, domainSlug: domain ? domain.slug || slugify(domain.name) : undefined, skillSlugs: draft.skills.map((name) => skills.find((skill) => skill.name === name)?.slug || slugify(name)) })
+      }}>
         <div className="job-filter__body profile-form__grid">
-          <label className="profile-field"><span>Hình thức làm việc</span><select value={draft.workType} onChange={(event) => setDraft({ ...draft, workType: event.target.value })}><option value="">Tất cả hình thức</option>{workTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
-          <label className="profile-field"><span>Lĩnh vực</span><select value={draft.field} onChange={(event) => setDraft({ ...draft, field: event.target.value })}><option value={ALL_FIELDS}>Tất cả lĩnh vực</option>{fields.map((field) => <option key={field.label}>{field.label}</option>)}</select></label>
+          <label className="profile-field"><span>Hình thức làm việc</span><select value={draft.workType} onChange={(event) => setDraft({ ...draft, workType: event.target.value })}><option value="">Tất cả hình thức</option>{workTypes.map((type) => <option key={type} value={type}>{type.replaceAll('_', ' ')}</option>)}</select></label>
+          <label className="profile-field"><span>Chuyên môn</span><select value={draft.domainId ?? ''} disabled={fieldsLoading || Boolean(fieldsError)} onChange={(event) => {
+            const domainId = Number(event.target.value) || undefined
+            setDraft({ ...draft, domainId, field: fields.find((field) => field.id === domainId)?.name ?? ALL_FIELDS, skills: [] })
+            setSkills([]); setSkillsError(''); setSkillsLoading(Boolean(domainId))
+          }}><option value="">{fieldsLoading ? 'Đang tải chuyên môn...' : 'Tất cả chuyên môn'}</option>{fields.map((field) => <option key={field.id} value={field.id}>{field.name}</option>)}</select></label>
+          {fieldsError && <div className="profile-field--full" role="alert">{fieldsError}<button type="button" onClick={() => { setFieldsLoading(true); setFieldsError(''); setRetry((value) => value + 1) }}>Tải lại chuyên môn</button></div>}
           <FilterRange label="Khoảng kinh nghiệm" value={draft.experience} max={10} unit="năm" onChange={(experience) => setDraft({ ...draft, experience })} />
           <label className="profile-checkbox profile-field--full"><input type="checkbox" checked={draft.negotiable} onChange={(event) => setDraft({ ...draft, negotiable: event.target.checked })} /><span>Lương thỏa thuận</span><small>Chỉ hiển thị việc làm có lương thỏa thuận.</small></label>
           <FilterRange label="Khoảng lương" value={draft.salary} max={100} unit="triệu" disabled={draft.negotiable} onChange={(salary) => setDraft({ ...draft, salary })} />
-          <div className="profile-field profile-field--full"><label htmlFor="job-filter-skills">Kỹ năng <small>({draft.skills.length}/6)</small></label><select id="job-filter-skills" value="" disabled={draft.skills.length >= 6} onChange={(event) => { const skill = event.target.value; if (skill && !draft.skills.includes(skill)) setDraft({ ...draft, skills: [...draft.skills, skill] }) }}><option value="">{draft.skills.length >= 6 ? 'Đã chọn tối đa 6 kỹ năng' : 'Chọn kỹ năng'}</option>{skills.filter((skill) => !draft.skills.includes(skill.label)).map((skill) => <option key={skill.label}>{skill.label}</option>)}</select><div className="skill-chips">{draft.skills.map((skill) => <span className="skill-chip" key={skill}>{skill}<button type="button" className="skill-chip__remove" aria-label={`Xóa ${skill}`} onClick={() => setDraft({ ...draft, skills: draft.skills.filter((item) => item !== skill) })}>×</button></span>)}</div></div>
+          <div className="profile-field profile-field--full"><label htmlFor="job-filter-skills">Kỹ năng <small>({draft.skills.length}/6)</small></label><select id="job-filter-skills" value="" disabled={!draft.domainId || skillsLoading || Boolean(skillsError) || draft.skills.length >= 6} onChange={(event) => { const skill = event.target.value; if (skill && draft.skills.length < 6 && !draft.skills.includes(skill)) setDraft({ ...draft, skills: [...draft.skills, skill] }) }}><option value="">{!draft.domainId ? 'Chọn chuyên môn trước' : skillsLoading ? 'Đang tải kỹ năng...' : draft.skills.length >= 6 ? 'Đã chọn tối đa 6 kỹ năng' : 'Chọn kỹ năng'}</option>{skills.filter((skill) => !draft.skills.includes(skill.name)).map((skill) => <option key={skill.id} value={skill.name}>{skill.name}</option>)}</select><div className="skill-chips">{draft.skills.map((skill) => <span className="skill-chip" key={skill}>{skill}<button type="button" className="skill-chip__remove" aria-label={`Xóa ${skill}`} onClick={() => setDraft({ ...draft, skills: draft.skills.filter((item) => item !== skill) })}>×</button></span>)}</div></div>
+          {skillsError && <div className="profile-field--full" role="alert">{skillsError}<button type="button" onClick={() => { setSkillsLoading(true); setSkillsError(''); setRetry((value) => value + 1) }}>Tải lại kỹ năng</button></div>}
         </div>
-        <footer className="job-filter__footer"><button type="button" className="button button-outline" onClick={() => setDraft(defaultJobFilters)}>Đặt lại</button><button type="submit" className="button button-primary">Lọc</button></footer>
+        <footer className="job-filter__footer"><button type="button" className="button button-outline" onClick={() => { setDraft(defaultJobFilters); setSkills([]); setSkillsError(''); setSkillsLoading(false) }}>Đặt lại</button><button type="submit" className="button button-primary" disabled={fieldsLoading || skillsLoading || Boolean(fieldsError) || Boolean(skillsError)}>Lọc</button></footer>
       </form>
     </div>
   </dialog>
