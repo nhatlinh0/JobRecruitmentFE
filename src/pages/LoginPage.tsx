@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { Toast, type ToastMessage } from '../components/ui/Toast'
 import type { LoginPayload } from '../types/auth'
 import './RegisterPage.css'
+import './AuthPages.css'
 
 function extractToken(body: unknown): string | null {
   if (typeof body === 'string') return body.trim() || null
@@ -72,7 +73,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="register">
+    <div className="register auth-page auth-page--login">
       <Toast notification={notification} onClose={closeToast} />
       <form className="register__form" onSubmit={handleSubmit}>
         <h1>Đăng nhập</h1>

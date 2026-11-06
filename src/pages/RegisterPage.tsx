@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Toast, type ToastMessage } from '../components/ui/Toast'
 import type { RegisterPayload, Role } from '../types/auth'
 import './RegisterPage.css'
+import './AuthPages.css'
 
 export function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -55,7 +56,7 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="register">
+    <div className="register auth-page auth-page--register">
       <Toast notification={notification} onClose={closeToast} />
       <form className="register__form" onSubmit={handleSubmit}>
         <h1>Đăng ký</h1>

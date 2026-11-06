@@ -1,0 +1,104 @@
+.register.auth-page {
+  --auth-forest: #1c4934;
+  --auth-lime: #d4f581;
+  position: relative;
+  min-height: 680px;
+  padding: 56px 28px 64px;
+  background: radial-gradient(ellipse at 7% 0, #e3ecda, transparent 50%), radial-gradient(ellipse at 95% 90%, #edf2e2, transparent 50%), #f5f7f2;
+}
+.auth-page .register__form {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  max-width: 1000px;
+  min-height: 540px;
+  justify-content: center;
+  gap: 23px;
+  padding: 58px 58px 58px 498px;
+  border: 1px solid #d9e3d4;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 60px -30px #1d3e3030, 0 3px 10px #1d3e3004;
+}
+/* Use the existing heading as the left panel, without changing form markup. */
+.auth-page .register__form::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 44%;
+  background: radial-gradient(ellipse at 100% 0, #496e43, transparent 65%), linear-gradient(145deg, #102e26, #224f36);
+  z-index: -1;
+  pointer-events: none;
+}
+.auth-page .register__form::after {
+  content: '';
+  position: absolute;
+  width: 310px;
+  height: 310px;
+  left: -95px;
+  bottom: -170px;
+  border: 1px solid #d4f5813b;
+  border-radius: 50%;
+  box-shadow: 0 0 0 42px #d4f58108, 0 0 0 84px #d4f58106, 0 0 0 126px #d4f58104;
+  z-index: -1;
+  pointer-events: none;
+}
+.auth-page .register__form h1 {
+  position: absolute;
+  left: 42px;
+  top: 38%;
+  width: calc(44% - 84px);
+  color: #fff;
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 760;
+  line-height: 1.25;
+  letter-spacing: -1.5px;
+  margin: 0;
+}
+.auth-page .register__form h1::before { content: 'JOBSEEKER'; display: block; color: #c4dfa2; font-size: 10px; font-weight: 650; line-height: 1.8; letter-spacing: 3px; margin-bottom: 20px; }
+.auth-page .register__form h1::after { content: ''; display: block; width: 52px; height: 4px; border-radius: 3px; background: var(--auth-lime); margin-top: 24px; }
+.auth-page .register__form > label { color: #3e583e; font-size: 13px; font-weight: 650; gap: 9px; }
+.auth-page .register__form input:not([type='radio']) { width: 100%; min-width: 0; min-height: 49px; border: 1px solid #dbe4d3; border-radius: 10px; background: #fafcf7; color: #263f2d; font-size: 15px; line-height: 1.5; padding: 12px 15px; box-shadow: inset 0 1px 2px #243d2902; transition: background .16s, border-color .16s, box-shadow .16s; }
+.auth-page .register__form input:not([type='radio']):hover { border-color: #b9cda9; }
+.auth-page .register__form input:not([type='radio']):focus { background: #fff; border-color: #7da267; outline: 2px solid #c4dbad; outline-offset: 2px; box-shadow: none; }
+.auth-page .register__form input:autofill { color: #263f2d; }
+.auth-page .register__form > button[type='submit'] { min-height: 49px; border: 1px solid #244e35; border-radius: 10px; background: #244e35; color: #f5ffe9; font-size: 14px; font-weight: 700; margin-top: 3px; box-shadow: 0 5px 13px #244e3518; transition: background .15s, box-shadow .15s; }
+.auth-page .register__form > button[type='submit']:hover:not(:disabled) { border-color: #173e29; background: #173e29; box-shadow: 0 7px 17px #244e3526; }
+.auth-page .register__form > button[type='submit']:disabled { opacity: .55; cursor: wait; box-shadow: none; }
+.auth-page .register__hint { color: #7b8972; font-size: 12px; line-height: 1.8; padding-top: 3px; }
+.auth-page .register__hint a { color: #426d36; font-weight: 750; text-decoration: underline; text-decoration-color: #c3d5b0; text-underline-offset: 4px; }
+.auth-page .register__hint a:hover { color: #214d2b; text-decoration-color: #214d2b; }
+.auth-page--register .register__form { min-height: 650px; padding-top: 42px; padding-bottom: 42px; gap: 19px; }
+.auth-page--register .register__form h1 { top: 34%; }
+.auth-page .register__type { display: grid; gap: 9px; padding: 12px 0 0; margin: 0; border: 0; min-width: 0; }
+.auth-page .register__type legend { color: #3e583e; font-size: 13px; font-weight: 650; padding: 0; }
+.auth-page .register__type label { min-height: 47px; padding: 11px 13px; gap: 10px; border: 1px solid #dfe6d7; border-radius: 9px; background: #fafcf7; color: #6b7e5e; font-size: 12px; font-weight: 550; line-height: 1.5; transition: border-color .15s, background .15s; }
+.auth-page .register__type label:hover { border-color: #a8c38c; background: #f4f8ed; }
+.auth-page .register__type label:has(input:checked) { border-color: #9cbb7c; color: #3a5c2e; background: #edf5e0; box-shadow: inset 3px 0 #7ba24d; }
+.auth-page .register__type input[type='radio'] { appearance: auto; width: 16px; height: 16px; margin: 0; accent-color: #4d7338; flex-shrink: 0; }
+.auth-page .register__type label:focus-within { outline: 2px solid #adc88d; outline-offset: 2px; }
+@media (max-width: 1050px) {
+  .auth-page .register__form { padding: 46px 38px 46px 50%; }
+  .auth-page .register__form h1 { left: 34px; width: calc(44% - 68px); font-size: 38px; }
+  .auth-page--register .register__form { padding-top: 36px; padding-bottom: 36px; }
+}
+@media (max-width: 700px) {
+  .register.auth-page { min-height: 0; padding: 30px 20px 44px; }
+  .auth-page .register__form, .auth-page--register .register__form { max-width: 480px; min-height: 0; padding: 32px; gap: 21px; border-radius: 20px; }
+  .auth-page .register__form::before { inset: 0 0 auto; width: 100%; height: 152px; }
+  .auth-page .register__form::after { width: 190px; height: 190px; left: auto; right: -65px; top: -105px; bottom: auto; box-shadow: 0 0 0 30px #d4f58108, 0 0 0 60px #d4f58105; }
+  .auth-page .register__form h1, .auth-page--register .register__form h1 { position: static; width: 100%; font-size: 31px; line-height: 1.3; letter-spacing: -.8px; margin: 0 0 36px; }
+  .auth-page .register__form h1::before { font-size: 9px; letter-spacing: 2px; margin-bottom: 10px; }
+  .auth-page .register__form h1::after { display: none; }
+  .auth-page--register .register__form { gap: 18px; }
+  .auth-page--register .register__form h1 { margin-bottom: 39px; }
+}
+@media (max-width: 380px) {
+  .register.auth-page { padding: 22px 14px 34px; }
+  .auth-page .register__form, .auth-page--register .register__form { padding: 28px 24px; }
+  .auth-page .register__form::before { height: 144px; }
+  .auth-page .register__form h1, .auth-page--register .register__form h1 { margin-bottom: 36px; font-size: 29px; }
+  .auth-page .register__type label { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { .auth-page * { transition: none !important; } }

@@ -66,6 +66,7 @@
 }
 
 .company-mark.pink { background: #fff0f5; color: #d64480; }
+.job-card__company-logo { object-fit: contain; background: #fff; border: 1px solid #e3eae5; padding: 4px; box-sizing: border-box; }
 .company-mark.blue { background: #edf6ff; color: #3189d8; }
 .company-mark.indigo { background: #edf0ff; color: #596fcd; }
 .company-mark.orange { background: #fff2e9; color: #e27843; }
@@ -134,6 +135,10 @@
 .save-button.is-saved svg {
   fill: #d6eade;
 }
+
+.job-card__remove-saved { color: #b45344; background: #fff5f1; border-color: #f0ded5; }
+.job-card__remove-saved:hover { color: #a5392b; background: #ffebe5; border-color: #e4bfb4; }
+.job-card__remove-saved:disabled { opacity: .5; cursor: wait; }
 
 .job-card h3 {
   color: var(--ink);

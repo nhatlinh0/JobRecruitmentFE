@@ -8,9 +8,11 @@ interface JobListProps {
   savedIds: number[]
   onToggleSave: (jobId: number) => void
   onReset: () => void
+  onRemoveSaved?: (jobId: number) => void
+  removingSaved?: boolean
 }
 
-export function JobList({ jobs, savedIds, onToggleSave, onReset }: JobListProps) {
+export function JobList({ jobs, savedIds, onToggleSave, onReset, onRemoveSaved, removingSaved }: JobListProps) {
   if (jobs.length === 0) {
     return (
       <div className="job-list">
@@ -34,6 +36,8 @@ export function JobList({ jobs, savedIds, onToggleSave, onReset }: JobListProps)
           job={job}
           key={job.id}
           onToggleSave={onToggleSave}
+          onRemoveSaved={onRemoveSaved}
+          removingSaved={removingSaved}
         />
       ))}
     </div>

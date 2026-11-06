@@ -1,27 +1,37 @@
 .site-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  border-top: 1px solid #e9eee9;
-  color: #89958e;
-  display: flex;
-  font-size: 10px;
-  justify-content: space-between;
+  gap: 14px 30px;
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
-  max-width: 1240px;
-  padding: 22px 36px 28px;
+  padding: 42px 48px 26px;
+  border-top: 1px solid #365641;
+  background: radial-gradient(ellipse at 95% 0, #355338, transparent 60%), #17372b;
+  color: #93af91;
+  font-size: 11px;
 }
-
-.site-footer p {
-  margin: 0;
+.site-footer::before { content: ''; position: absolute; right: -70px; top: -190px; width: 280px; height: 280px; border: 1px solid #c9e5a114; border-radius: 50%; box-shadow: 0 0 0 40px #c9e5a105, 0 0 0 80px #c9e5a103; z-index: -1; pointer-events: none; }
+.site-footer .logo.logo-small { grid-column: 1; grid-row: 1; font-size: 25px; font-weight: 750; color: #f0f6e9; letter-spacing: -1.1px; gap: 11px; justify-self: start; }
+.site-footer .logo-accent { color: #c9eaa0; }
+.site-footer .logo-small .logo-mark { width: 39px; height: 39px; border: 1px solid #d4f581; border-radius: 11px; background: #d4f581; color: #285032; box-shadow: 0 4px 12px #0001; }
+.site-footer .logo-small .logo-mark svg { width: 23px; height: 23px; }
+.site-footer p { grid-column: 2; grid-row: 1; color: #c3d4b6; font-size: 13px; font-weight: 450; line-height: 1.8; margin: 0; letter-spacing: -.1px; text-align: right; }
+.site-footer > span { grid-column: 1 / -1; padding-top: 22px; margin-top: 10px; border-top: 1px solid #a6c78524; color: #8ea68a; font-size: 11px; line-height: 1.8; letter-spacing: .1px; }
+.site-footer .logo:hover .logo-accent { color: #e2ffb6; }
+@media (max-width: 1050px) {
+  .site-footer { padding: 34px 30px 24px; gap: 12px 24px; }
+  .site-footer .logo.logo-small { font-size: 22px; }
+  .site-footer p { max-width: 260px; font-size: 12px; }
 }
-
 @media (max-width: 760px) {
-  .site-footer {
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 20px 22px 25px;
-  }
-
-  .site-footer p {
-    display: none;
-  }
+  .site-footer { grid-template-columns: minmax(0, 1fr); padding: 32px 24px 24px; gap: 16px; }
+  .site-footer p { display: block; grid-column: 1; grid-row: 2; max-width: 100%; text-align: left; font-size: 12px; }
+  .site-footer > span { margin-top: 4px; padding-top: 18px; font-size: 10px; }
+  .site-footer .logo-small .logo-mark { width: 35px; height: 35px; border-radius: 10px; }
 }
+@media (max-width: 380px) { .site-footer { padding: 28px 20px 22px; } }

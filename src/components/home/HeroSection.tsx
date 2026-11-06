@@ -25,9 +25,9 @@ export function HeroSection({
       <div className="hero-copy">
         <div className="eyebrow"><span className="eyebrow-dot" /> NƠI SỰ NGHIỆP CÔNG NGHỆ BẮT ĐẦU</div>
         <h1>
-          Công việc tốt.
+          Bước tiến mới.
           <br />
-          <span>Cơ hội mới.</span>
+          <span>Sự nghiệp mới.</span>
           <br />
           Đúng chất IT.
         </h1>
@@ -57,12 +57,7 @@ export function HeroSection({
             </button>
           ))}
         </div>
-        <div className="hero-proof">
-          <div className="proof-avatars" aria-hidden="true">
-            <span>H</span><span>L</span><span>M</span><span>+</span>
-          </div>
-          <p><strong>12.000+</strong> ứng viên đã tìm được việc phù hợp</p>
-        </div>
+        <div className="hero-proof"><span className="hero-proof__icon"><Icon name="check" /></span><p>Khám phá công ty. <strong>Tìm đúng cơ hội của bạn.</strong></p></div>
       </div>
 
       <div className="hero-art" aria-hidden="true">
@@ -83,12 +78,12 @@ export function HeroSection({
         </div>
         <div className="match-card">
           <span className="match-icon"><Icon name="spark" /></span>
-          <span><strong>98% phù hợp</strong><small>Frontend Developer · Momo</small></span>
+          <span><strong>Công việc đúng chuyên môn</strong><small>Khám phá theo kỹ năng của bạn</small></span>
           <span className="match-arrow"><Icon name="arrow" /></span>
         </div>
         <div className="hero-stat-card">
           <span className="stat-icon"><Icon name="briefcase" /></span>
-          <span><strong>2.450+</strong><small>Việc làm mới</small></span>
+          <span><strong>Cơ hội tiếp theo</strong><small>Bắt đầu từ hôm nay</small></span>
           <span className="stat-trend"><Icon name="trend" /></span>
         </div>
         <div className="art-caption"><span />Your next chapter starts here</div>

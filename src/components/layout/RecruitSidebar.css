@@ -1,9 +1,18 @@
 .recruit-sidebar {
+  position: fixed;
+  top: var(--site-header-height, 84px);
+  bottom: 0;
+  left: max(0px, calc((100% - 1440px) / 2));
+  z-index: 40;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #c8d8ca transparent;
   background: #fff;
   border-right: 1px solid #e2ebe5;
   flex-shrink: 0;
   padding: 20px 12px;
-  width: 240px;
+  width: var(--site-sidebar-width, 240px);
 }
 
 .recruit-sidebar__list {
@@ -73,6 +82,8 @@
 
 @media (max-width: 900px) {
   .recruit-sidebar {
+    position: static;
+    overflow-y: visible;
     border-bottom: 1px solid #e2ebe5;
     border-right: 0;
     width: 100%;
