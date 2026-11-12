@@ -26,6 +26,7 @@ import { AdminIndustriesPage } from './pages/AdminIndustriesPage'
 import { AdminDomainsPage } from './pages/AdminDomainsPage'
 import { AdminSkillsPage } from './pages/AdminSkillsPage'
 import { JobSearchPage } from './pages/JobSearchPage'
+import { UpgradePackagesPage } from './pages/UpgradePackagesPage'
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
         <Route path="/categories/:groupId" element={<NavGroupPage />} />
         <Route path="/update-profile" element={<UpdateProfilePage />} />
         <Route path="/my-company" element={<MyCompanyPage />} />
+        <Route path="/recruit/upgrade" element={<UpgradePackagesPage />} />
         <Route path="/recruit/posts/new" element={<JobPostCreatePage />} />
         <Route path="/recruit/posts/:id/edit" element={<JobPostCreatePage />} />
         <Route path="/recruit/posts/:id/applicants" element={<JobApplicantsPage />} />

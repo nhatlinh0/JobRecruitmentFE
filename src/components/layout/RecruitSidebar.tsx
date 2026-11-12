@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import './RecruitSidebar.css'
+import { RecruitCredits } from './RecruitCredits'
 
 const menu = [
   { label: 'Trang chủ', to: '/' },
@@ -26,6 +27,7 @@ export function RecruitSidebar() {
 
   return (
     <aside className="recruit-sidebar" aria-label="Điều hướng nhà tuyển dụng">
+      <RecruitCredits />
       <nav>
         <ul className="recruit-sidebar__list">
           {menu.map((item) =>

@@ -1,6 +1,7 @@
 import { parseOptions, unwrap, type ProfileOption } from './userInfo'
 
 export interface CompanyProfile {
+  credits: number | null
   name: string
   slug: string
   address: string
@@ -43,7 +44,7 @@ export async function fetchIndustries(signal: AbortSignal): Promise<ProfileOptio
 }
 
 export async function fetchMyCompany(token: string, signal: AbortSignal): Promise<CompanyProfile | null> {
-  const response = await fetch('/api/api/v1/companies/my-company', { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }, signal })
+  const response = await fetch('/api/api/v1/companies/my-company', { cache: 'no-store', headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }, signal })
   // Tài khoản mới chưa có công ty: mở form tạo mới, không báo lỗi.
   if (response.status === 400 || response.status === 404) return null
   const body = await readResponse(response)
@@ -52,10 +53,11 @@ export async function fetchMyCompany(token: string, signal: AbortSignal): Promis
   const industry = value.industry && typeof value.industry === 'object' ? value.industry as Record<string, unknown> : null
   const text = (key: string) => typeof value[key] === 'string' ? value[key] as string : ''
   const industryId = Number(industry?.id ?? value.industryId ?? 0)
-  return { name: text('name'), slug: text('slug'), address: text('address'), companySize: String(value.companySize ?? ''), phone: text('phone'), country: text('country'), logoUrl: text('logoUrl'), profilePDFUrl: text('profilePdfUrl') || text('profilePDFUrl'), industryId, industry: industry && typeof industry.name === 'string' ? { id: industryId, name: industry.name } : null, description: text('description') }
+  const credits = value.credits
+  return { credits: typeof credits === 'number' && Number.isFinite(credits) ? credits : null, name: text('name'), slug: text('slug'), address: text('address'), companySize: String(value.companySize ?? ''), phone: text('phone'), country: text('country'), logoUrl: text('logoUrl'), profilePDFUrl: text('profilePdfUrl') || text('profilePDFUrl'), industryId, industry: industry && typeof industry.name === 'string' ? { id: industryId, name: industry.name } : null, description: text('description') }
 }
 
-export async function saveCompany(token: string, exists: boolean, company: Omit<CompanyProfile, 'industry' | 'logoUrl' | 'profilePDFUrl'>, logo: File | null, license: File | null): Promise<void> {
+export async function saveCompany(token: string, exists: boolean, company: Omit<CompanyProfile, 'industry' | 'logoUrl' | 'profilePDFUrl' | 'credits'>, logo: File | null, license: File | null): Promise<void> {
   const form = new FormData()
   Object.entries(company).forEach(([key, value]) => form.append(key, String(value)))
   if (logo) form.append('logoUrl', logo, logo.name)
