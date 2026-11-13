@@ -27,6 +27,7 @@ import { AdminDomainsPage } from './pages/AdminDomainsPage'
 import { AdminSkillsPage } from './pages/AdminSkillsPage'
 import { JobSearchPage } from './pages/JobSearchPage'
 import { UpgradePackagesPage } from './pages/UpgradePackagesPage'
+import { AdminPackagesPage } from './pages/AdminPackagesPage'
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/packages" element={<AdminPackagesPage />} />
         <Route path="/admin/companies" element={<AdminCompaniesPage />} />
         <Route path="/admin/users" element={<AdminUsersPage />} />
         <Route path="/admin/jobs" element={<AdminJobsPage />} />

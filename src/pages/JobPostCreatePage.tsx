@@ -7,6 +7,7 @@ import { assertCompanyCanPost, createJob, updateJob, fetchMyJob, type RecruitJob
 import { useAuth } from '../hooks/useAuth'
 import { Toast, type ToastMessage } from '../components/ui/Toast'
 import { slugify } from '../utils/slugify'
+import { fetchMyCompany } from '../services/company'
 import './JobPostViewPage.css'
 import './UpdateProfilePage.css'
 
@@ -69,6 +70,22 @@ function JobPostForm() {
     editingPost?.salary ? [editingPost.salary.min, editingPost.salary.max] : [5, 10],
   )
   const [featured, setFeatured] = useState(editingPost?.featured ?? false)
+  const [credits, setCredits] = useState<number | null>(null)
+  useEffect(() => {
+    if (!token || user?.role !== 'RECRUIT') return
+    const controller = new AbortController()
+    function refresh() {
+      fetchMyCompany(token!, controller.signal).then((company) => {
+        if (controller.signal.aborted) return
+        setCredits(company?.credits ?? null)
+        if (!id && company?.credits === 0) setFeatured(false)
+      }).catch(() => { if (!controller.signal.aborted) setCredits(null) })
+    }
+    refresh()
+    window.addEventListener('company-credits-changed', refresh)
+    window.addEventListener('focus', refresh)
+    return () => { controller.abort(); window.removeEventListener('company-credits-changed', refresh); window.removeEventListener('focus', refresh) }
+  }, [token, user?.role, id])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const slug = slugify(title)
@@ -165,8 +182,17 @@ function JobPostForm() {
 
     submitting.current = true; setSaving(true)
     try {
+      if (!id && featured) {
+        const company = await fetchMyCompany(token, AbortSignal.timeout(15000))
+        setCredits(company?.credits ?? null)
+        if (company?.credits == null || company.credits < 1) {
+          setFeatured(false)
+          throw new Error('Công ty không đủ credit để đăng việc làm nổi bật.')
+        }
+      }
       if (id) await updateJob(token, Number(id), post)
       else await createJob(token, post)
+      window.dispatchEvent(new Event('company-credits-changed'))
       setNotification({ type: 'success', message: id ? 'Đã cập nhật công việc thành công.' : 'Đã tạo công việc thành công.' })
     } catch (error) {
       setNotification({ type: 'error', message: error instanceof Error ? error.message : 'Không thể kết nối máy chủ.' })
@@ -401,7 +427,7 @@ function JobPostForm() {
           <label className="profile-checkbox">
             <input
               checked={featured}
-              disabled={isEdit}
+              disabled={isEdit || saving || credits === null || credits < 1}
               onChange={(event) => setFeatured(event.target.checked)}
               type="checkbox"
             />
@@ -409,7 +435,9 @@ function JobPostForm() {
             <small>
               {isEdit
                 ? 'Không thể thay đổi trạng thái nổi bật của bài đăng đã tạo.'
-                : 'Bài đăng nổi bật sẽ được ưu tiên hiển thị lên đầu trang chủ.'}
+                : credits === 0 ? 'Bạn đã hết credit. Vui lòng mua thêm gói để đăng việc làm nổi bật.'
+                : credits === null ? 'Đang chờ thông tin số dư credit.'
+                : `Đăng việc làm nổi bật sử dụng 1 credit. Số dư: ${credits} credits.`}
             </small>
           </label>
 

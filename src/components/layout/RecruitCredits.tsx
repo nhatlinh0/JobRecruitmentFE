@@ -14,7 +14,8 @@ export function RecruitCredits() {
   useEffect(() => {
     function refresh() { setRetry((value) => value + 1) }
     window.addEventListener('focus', refresh)
-    return () => window.removeEventListener('focus', refresh)
+    window.addEventListener('company-credits-changed', refresh)
+    return () => { window.removeEventListener('focus', refresh); window.removeEventListener('company-credits-changed', refresh) }
   }, [])
   useEffect(() => {
     if (!token || user?.role !== 'RECRUIT') return
